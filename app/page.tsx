@@ -44,9 +44,9 @@ export default function Home() {
       <div className="fixed inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http://www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23e2e8f0%22%20fill-opacity%3D%220.4%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%221.5%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30 dark:opacity-15 -z-10"></div>
       
       {/* Floating Gradient Blobs */}
-      <div className="fixed top-20 -left-40 w-80 h-80 bg-blue-300/10 rounded-full mix-blend-multiply filter blur-xl animate-pulse -z-10"></div>
-      <div className="fixed top-1/3 right-0 w-96 h-96 bg-indigo-300/8 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000 -z-10"></div>
-      <div className="fixed bottom-1/4 -left-20 w-72 h-72 bg-purple-300/8 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-4000 -z-10"></div>
+      <div className="fixed top-20 -left-40 w-80 h-80 bg-blue-300/10 rounded-full mix-blend-multiply filter blur-xl animate-blob-float -z-10"></div>
+      <div className="fixed top-1/3 right-0 w-96 h-96 bg-indigo-300/8 rounded-full mix-blend-multiply filter blur-xl animate-blob-float-reverse animation-delay-2000 -z-10"></div>
+      <div className="fixed bottom-1/4 -left-20 w-72 h-72 bg-purple-300/8 rounded-full mix-blend-multiply filter blur-xl animate-blob-float animation-delay-4000 -z-10"></div>
       
       {/* Critical above-the-fold content */}
       <Navbar />

@@ -210,7 +210,7 @@ html {
 
 /* Smooth hover transitions */
 .transition-smooth {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.35s cubic-bezier(0.77,0,0.175,1);
 }
 
 /* Optimized backdrop blur */
@@ -263,6 +263,56 @@ img {
   animation: marquee 30s linear infinite;
 }
 
-.animate-marquee:hover {
-  animation-play-state: paused;
+.animate-marquee-fast {
+  animation: marquee 12s linear infinite;
+}
+
+/* --- Butter Smooth Enhancements --- */
+
+/* Smoother, more natural blob floating with cubic-bezier and scale/rotate */
+@keyframes blobFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  20% {
+    transform: translateY(-18px) scale(1.04) rotate(2deg);
+  }
+  50% {
+    transform: translateY(12px) scale(0.98) rotate(-2deg);
+  }
+  70% {
+    transform: translateY(-10px) scale(1.02) rotate(1deg);
+  }
+}
+.animate-blob-float {
+  animation: blobFloat 10s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+}
+
+@keyframes blobFloatReverse {
+  0%, 100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  20% {
+    transform: translateY(18px) scale(1.03) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-12px) scale(0.97) rotate(2deg);
+  }
+  70% {
+    transform: translateY(10px) scale(1.01) rotate(-1deg);
+  }
+}
+.animate-blob-float-reverse {
+  animation: blobFloatReverse 11s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+}
+
+/* Fade-in-up on scroll (for buttery smooth section reveals) */
+.fade-in-up-on-scroll {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.9s cubic-bezier(0.77,0,0.175,1), transform 0.9s cubic-bezier(0.77,0,0.175,1);
+}
+.fade-in-up-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
 }

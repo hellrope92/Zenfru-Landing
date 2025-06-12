@@ -1,8 +1,27 @@
 "use client";
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { motion, useAnimation } from 'framer-motion'; // Import motion and useAnimation
-import { useInView } from 'react-intersection-observer'; // Import useInView
+
+// Custom hook for scroll reveal
+function useScrollReveal<T extends HTMLElement = HTMLElement>(options?: IntersectionObserverInit) {
+  const ref = useRef<T | null>(null);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          node.classList.add('visible');
+          observer.unobserve(node);
+        }
+      },
+      { threshold: 0.15, ...options }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [options]);
+  return ref;
+}
 
 const CoreValueSection = () => {
   const features = [
@@ -32,96 +51,61 @@ const CoreValueSection = () => {
     }
   ];
 
-  // Animation variants for Framer Motion
-  const containerVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
-    }
-  };
-  const stickyTopOffset = '100px'; // Defines how far from the top the cards will stick
-    return (
+  const headingRef = useScrollReveal<HTMLHeadingElement>();
+  const subtitleRef = useScrollReveal<HTMLParagraphElement>({ rootMargin: '-40px' });
+  const cardRefs = features.map(() => useScrollReveal<HTMLDivElement>({ rootMargin: '-60px' }));
+  const stickyTopOffset = '100px';
+
+  return (
     <section id="features" className="py-16 md:py-24 w-full relative">
-      <div className="container mx-auto px-6 md:px-8 relative z-10">
-        <div className="max-w-3xl mx-auto text-center mb-16">          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-xs uppercase text-blue-600 dark:text-blue-400 font-semibold tracking-wider mb-4"
-          >
-            Core Value Proposition
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-8"
-          >
-            "Never miss a patient call again — even when you're closed."
-          </motion.p>
-        </div>
-
-        {/* Container for the sticky cards */}
-        <div className="relative max-w-5xl mx-auto"> {/* Removed space-y-*, margin will be on cards now */}
-          {features.map((feature, index) => {
-            const controls = useAnimation();
-            const { ref, inView } = useInView({
-              triggerOnce: true, // Only trigger once
-              threshold: 0.2, // Trigger when 20% of the element is in view
-            });
-
-            React.useEffect(() => {
-              if (inView) {
-                controls.start("visible");
-              } else {
-                // Optional: If you want cards to reset animation when scrolled out and back in (and triggerOnce is false)
-                // controls.start("hidden"); 
-              }
-            }, [controls, inView]);
-
-            return (
-              <motion.div
-                key={index}
-                ref={ref}
-                initial="hidden"
-                animate={controls}
-                variants={containerVariants}
-                className={`
-                  flex flex-col md:flex-row items-center gap-8 md:gap-12 
-                  bg-white p-6 md:p-8 rounded-xl shadow-xl
-                  ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}
-                  mb-24 md:mb-32  // Increased margin-bottom to create scroll space between cards
-                `}
-                style={{
-                  position: 'sticky',
-                  top: stickyTopOffset,
-                  zIndex: index + 1, // Ensures subsequent cards stack on top
-                }}
-              >
-                {/* Text Content */}
-                          <div className="md:w-1/2 text-center md:text-left">
-                  <h3 className="text-2xl md:text-3xl font-bold mb-6 text-slate-900 dark:text-white bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
-                    {feature.title}
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-lg">
-                    {feature.description}
-                  </p>
-                </div>
-                {/* Image Content */}
-                <div className="md:w-1/2 flex justify-center items-center p-6 bg-gradient-to-br from-blue-50/80 to-indigo-50/80 dark:from-blue-950/50 dark:to-indigo-950/50 backdrop-blur-sm border border-blue-200/30 dark:border-blue-800/30 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 aspect-square max-w-md w-full overflow-hidden group">
-                  <Image
-                    src={feature.imageSrc}
-                    alt={feature.imageAlt}
-                    width={400} 
-                    height={400} 
-                    className="rounded-lg object-contain transform transition-all duration-700 group-hover:scale-110 filter grayscale-[20%] group-hover:grayscale-0 group-hover:drop-shadow-lg"
-                  />
-                </div>
-              </motion.div>
-            );
-          })}
+      <div className="container mx-auto px-6 md:px-8 relative z-10 justify-center items-center text-center">
+        <h2
+          ref={headingRef}
+          className="fade-in-up-on-scroll text-xs uppercase text-blue-600 dark:text-blue-400 font-semibold tracking-wider mb-4"
+        >
+          Core Value Proposition
+        </h2>
+        <p
+          ref={subtitleRef}
+          className="fade-in-up-on-scroll text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-8"
+        >
+          "Never miss a patient call again — even when you're closed."
+        </p>
+        <div className="relative max-w-5xl mx-auto">
+          {features.map((feature, index) => (
+            <div
+              key={index}
+              ref={cardRefs[index]}
+              className={`fade-in-up-on-scroll flex flex-col md:flex-row items-center gap-8 md:gap-12 bg-white p-6 md:p-8 rounded-xl shadow-xl ${index % 2 === 1 ? 'md:flex-row-reverse' : ''} mb-24 md:mb-32`}
+              style={{
+                position: 'sticky',
+                top: stickyTopOffset,
+                zIndex: index + 1,
+                transitionDelay: `${0.1 + index * 0.13}s`, // staggered reveal
+              }}
+            >
+              {/* Text Content */}
+              <div className="md:w-1/2 text-center md:text-left">
+                <h3 className="text-2xl md:text-3xl font-bold mb-6 text-slate-900 dark:text-white bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
+                  {feature.title}
+                </h3>
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-lg">
+                  {feature.description}
+                </p>
+              </div>
+              {/* Image Content */}
+              <div className="md:w-1/2 flex justify-center items-center p-6 bg-gradient-to-br from-blue-50/80 to-indigo-50/80 dark:from-blue-950/50 dark:to-indigo-950/50 backdrop-blur-sm border border-blue-200/30 dark:border-blue-800/30 rounded-xl shadow-xl hover:shadow-2xl transition-smooth duration-500 aspect-square max-w-md w-full overflow-hidden group">
+                <Image
+                  src={feature.imageSrc}
+                  alt={feature.imageAlt}
+                  width={400}
+                  height={400}
+                  className="rounded-lg object-contain transform transition-all duration-700 group-hover:scale-110 filter grayscale-[20%] group-hover:grayscale-0 group-hover:drop-shadow-lg"
+                  style={{ transitionTimingFunction: 'cubic-bezier(0.77,0,0.175,1)' }}
+                />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

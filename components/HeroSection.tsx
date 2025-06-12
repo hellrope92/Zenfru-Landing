@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { Component as Orb } from './orb'; // Assuming 'orb.tsx' exports 'Component' as Orb
 
@@ -15,8 +13,8 @@ export default function HeroSection() {
       </div>
 
       {/* Gradient Blobs */}
-      <div className="absolute top-20 -left-40 w-80 h-80 bg-blue-300/30 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
-      <div className="absolute bottom-20 -right-40 w-96 h-96 bg-indigo-300/30 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"></div>
+      <div className="absolute top-20 -left-40 w-80 h-80 bg-blue-300/30 rounded-full mix-blend-multiply filter blur-xl animate-blob-float"></div>
+      <div className="absolute bottom-20 -right-40 w-96 h-96 bg-indigo-300/30 rounded-full mix-blend-multiply filter blur-xl animate-blob-float-reverse"></div>
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8 text-center">
         
@@ -55,11 +53,11 @@ export default function HeroSection() {
         {/* CTA Buttons */}
         <div className="mb-16 animate-fade-in-up animation-delay-600">
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button className="group relative px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-50 min-w-[200px] text-lg">
+            <button className="group relative px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-smooth duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-50 min-w-[200px] text-lg">
               <span className="relative z-10">Join Waitlist</span>
             </button>
             
-            <button className="group px-10 py-5 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-2 border-blue-500 dark:border-indigo-500 text-blue-600 dark:text-indigo-400 font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-indigo-400 focus:ring-opacity-50 min-w-[200px] text-lg">
+            <button className="group px-10 py-5 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-2 border-blue-500 dark:border-indigo-500 text-blue-600 dark:text-indigo-400 font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-smooth duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-indigo-400 focus:ring-opacity-50 min-w-[200px] text-lg">
               <span className="flex items-center justify-center gap-3">
                 <svg className="w-6 h-6 group-hover:animate-bounce" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
