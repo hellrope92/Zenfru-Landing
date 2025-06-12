@@ -181,7 +181,7 @@ export const Component: FC<ComponentProps> = ({
     if (!container) return;
 
     let rendererInstance: Renderer | null = null;
-    let glContext: WebGLRenderingContext | WebGL2RenderingContext | null = null;
+    let glContext: any = null; // Use any type to work around OGL type strictness
     let rafId: number;
     
     try {
@@ -192,7 +192,11 @@ export const Component: FC<ComponentProps> = ({
         if (container.firstChild) {
             container.removeChild(container.firstChild);
         }
-        container.appendChild(glContext.canvas);
+        
+        // Ensure we have an HTMLCanvasElement before appending
+        if (glContext.canvas instanceof HTMLCanvasElement) {
+            container.appendChild(glContext.canvas);
+        }
 
         const geometry = new Triangle(glContext);
         const program = new Program(glContext, {
@@ -226,8 +230,10 @@ export const Component: FC<ComponentProps> = ({
             if (width === 0 || height === 0) return;
 
             rendererInstance.setSize(width * dpr, height * dpr); // Set renderer size with DPR
-            glContext.canvas.style.width = width + "px";
-            glContext.canvas.style.height = height + "px";
+            if (glContext.canvas instanceof HTMLCanvasElement) {
+                glContext.canvas.style.width = width + "px";
+                glContext.canvas.style.height = height + "px";
+            }
             
             program.uniforms.iResolution.value.set(
                 glContext.canvas.width, // Use drawing buffer width/height
@@ -300,7 +306,7 @@ export const Component: FC<ComponentProps> = ({
           if (container) {
             container.removeEventListener("mousemove", handleMouseMove);
             container.removeEventListener("mouseleave", handleMouseLeave);
-            if (glContext && glContext.canvas && glContext.canvas.parentNode === container) {
+            if (glContext && glContext.canvas instanceof HTMLCanvasElement && glContext.canvas.parentNode === container) {
               container.removeChild(glContext.canvas);
             }
           }
