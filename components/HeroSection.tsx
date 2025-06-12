@@ -1,6 +1,5 @@
 import React from 'react';
-import { Component as Orb } from './orb'; // Assuming 'orb.tsx' exports 'Component' as Orb
-
+import Orb from './orb';
 export default function HeroSection() {
   return (
     <section className="relative min-h-screen max-w-100vw bg-gradient-to-br from-slate-50 via-blue-50/50 to-indigo-50 dark:from-slate-900 dark:via-blue-950/30 dark:to-indigo-950/20 overflow-hidden pt-16 pb-12">
@@ -9,7 +8,7 @@ export default function HeroSection() {
       
       {/* Floating Orb Background */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] opacity-40 dark:opacity-25 pointer-events-none">
-        <Orb hue={220} hoverIntensity={0.6} rotateOnHover={true} forceHoverState={true} />
+        <Orb hue={50} hoverIntensity={0.2} rotateOnHover={true} forceHoverState={true} />
       </div>
 
       {/* Gradient Blobs */}
