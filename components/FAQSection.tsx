@@ -36,10 +36,9 @@ const FAQSection = () => {
     {
       question: "What information can the AI provide to patients?",
       answer: "The AI can provide comprehensive practice information including location details, parking information, dentist bios, office hours, accepted insurance plans, and can automatically send new patient intake forms via text message."
-    },
-    {
+    },    {
       question: "How does this help my practice financially?",
-      answer: "You'll capture lost revenue from missed calls, reduce front desk staff burnout, handle call volume spikes automatically, and convert more first-time callers into booked patients. It's about maximizing every patient opportunity, 24/7."
+      answer: "You'll capture lost revenue from missed calls, reduce front desk staff burnout, handle call volume spikes automatically, and convert more first-time callers into booked patients. Our pilot results show: 10-15% increase in monthly revenues, 20-25% increase in monthly profit, >90% call answer rate achieved, and ~80% reduction in missed calls. It's about maximizing every patient opportunity, 24/7."
     }
   ];  return (
     <section id="faq" className="py-16 bg-slate-50 dark:bg-slate-900 relative">

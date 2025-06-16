@@ -22,7 +22,7 @@ export default function HeroSection() {
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/30 backdrop-blur-sm border border-blue-200 dark:border-blue-800 rounded-full">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <span className="text-sm font-medium text-blue-700 dark:text-blue-300 ">
-              Available 24/7 • HIPAA Compliant
+              Available 24/7 
             </span>
           </div>
         </div>
@@ -43,7 +43,7 @@ export default function HeroSection() {
         {/* Subtitle */}
         <div className="mb-12 animate-fade-in-up animation-delay-400">
           <p className="max-w-3xl mx-auto text-xl text-slate-600 dark:text-slate-400 sm:text-2xl leading-relaxed">
-            AI-powered virtual front desk that handles appointments, 
+            AI-powered virtual front desk that <span className="text-blue-600 dark:text-blue-400 font-semibold"> handles appointments, </span> 
             <span className="text-blue-600 dark:text-blue-400 font-semibold"> books patients</span>, and 
             <span className="text-blue-600 dark:text-blue-400 font-semibold"> manages calls</span> when your staff can't
           </p>
@@ -76,7 +76,7 @@ export default function HeroSection() {
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               </div>
-              <span>Easy 5-Min Setup</span>
+              <span>Simple Setup</span>
             </div>
             
             <div className="flex items-center gap-3">
@@ -91,14 +91,7 @@ export default function HeroSection() {
             
 
             {/* Added Key Benefit: Reduce Staff Load */}
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center shadow-md">
-                <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.414L11 10.586V6z" clipRule="evenodd"/>
-                </svg>
-              </div>
-              <span>Reduce Staff Workload</span>
-            </div>
+            
           </div>
         </div>
       </div>

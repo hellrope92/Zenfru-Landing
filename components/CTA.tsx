@@ -58,9 +58,10 @@ const CTA = () => {
                     </svg>
                   </span>
                 </Link>
-                
-                <Link
-                  href="/pricing"
+                  <Link
+                  href="https://calendly.com/kay-zenfru"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="group inline-flex items-center justify-center px-10 py-5 text-lg font-semibold text-gray-300 border-2 border-gray-600 rounded-2xl hover:border-blue-400 hover:text-white hover:bg-blue-950/30 focus:outline-none focus:ring-4 focus:ring-blue-500/30 transition-all duration-300 backdrop-blur-sm min-w-[240px]"
                 >
                   Get In Touch

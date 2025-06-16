@@ -26,19 +26,19 @@ function useScrollReveal<T extends HTMLElement = HTMLElement>(options?: Intersec
 const CoreValueSection = () => {
   const features = [
     {
-      title: 'Real-time phone handling.',
+      title: 'Real-time phone handling',
       description: 'Every call is picked up instantly, with human-like AI that books, reschedules, and provides information.',
       imageSrc: '/Zenfru1.png',
       imageAlt: 'Real-time phone handling illustration',
     },
     {
-      title: 'Emergency triage.',
+      title: 'Emergency triage',
       description: 'Escalations and non-urgent cases are identified and routed seamlessly, day or night.',
       imageSrc: '/Zenfru2.png',
       imageAlt: 'Emergency triage illustration',
     },
     {
-      title: 'HIPAA-compliant security.',
+      title: 'HIPAA-compliant security',
       description: 'Patient info stays private with end-to-end encryption and safe data practices.',
       imageSrc: '/Zenfru3.png',
       imageAlt: 'HIPAA-compliant security illustration',
@@ -57,19 +57,14 @@ const CoreValueSection = () => {
   const stickyTopOffset = '100px';
 
   return (
-    <section id="features" className="py-16 md:py-24 w-full relative">
+    <section id="features" className="py-16 md:py-24 w-full relative ">
       <div className="container mx-auto px-6 md:px-8 relative z-10 justify-center items-center text-center">
-        <h2
-          ref={headingRef}
-          className="fade-in-up-on-scroll text-xs uppercase text-blue-600 dark:text-blue-400 font-semibold tracking-wider mb-4"
-        >
-          Core Value Proposition
-        </h2>
+        
         <p
           ref={subtitleRef}
           className="fade-in-up-on-scroll text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-8"
         >
-          "Never miss a patient call again — even when you're closed."
+          "Never miss a patient call again — even when you're closed"
         </p>
         <div className="relative max-w-5xl mx-auto">
           {features.map((feature, index) => (
