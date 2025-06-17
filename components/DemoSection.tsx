@@ -19,9 +19,9 @@ interface DemoSectionProps {
 const StopDemoButton = ({ onStop }: { onStop: () => void }) => (
   <button
     onClick={onStop}
-    className="fixed top-6 left-6 flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors duration-200 z-50 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg border border-slate-200 mt-16"
+    className="fixed top-6 left-6 flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-200 z-50 bg-black/40 backdrop-blur-sm rounded-lg px-4 py-3 shadow-2xl border border-white/20 mt-16 hover:bg-black/60"
   >
-    <XCircle className="w-6 h-6 " />
+    <XCircle className="w-5 h-5" />
     <span className="font-medium">Stop Demo</span>
   </button>
 );
@@ -190,27 +190,30 @@ export default function DemoSection({ onBack }: DemoSectionProps) {
     if (item.type === 'ai') return 'Zenfru'; // Changed from Arini to Zenfru
     if (item.type === 'human') return 'Patient';
     return item.speaker;
-  };
-
-  // Common layout for pre-conversation phases
+  };  // Common layout for pre-conversation phases
   const DemoLayout = ({ children }: { children: React.ReactNode }) => (
-    <section className="min-h-screen bg-sky-100 text-slate-800 flex items-center justify-center relative p-6 ">
-      <StopDemoButton onStop={handleStopDemo} />
-      <div className="text-center max-w-3xl mx-auto animate-fade-in-up ">
+    <section className="min-h-screen bg-sky-100 text-slate-800 flex items-center justify-center relative p-6">
+      <button
+        onClick={handleStopDemo}
+        className="fixed top-6 left-6 flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors duration-200 z-50 bg-white/90 backdrop-blur-sm rounded-lg px-4 py-3 shadow-lg border border-slate-200 mt-16"
+      >
+        <XCircle className="w-5 h-5" />
+        <span className="font-medium">Stop Demo</span>
+      </button>
+      <div className="text-center max-w-3xl mx-auto animate-demo-slide-in">
         {children}
       </div>
       <audio ref={audioRef} src="/zenfru-demo.mp3" preload="auto" />
     </section>
   );
-  if (phase === 'intro') {
-     return (
+  if (phase === 'intro') {     return (
       <DemoLayout>
         <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">This is an audio demo for</h1>
         <h2 className="text-4xl md:text-5xl font-bold text-blue-600 mb-8">BrightSmile Dental Clinic</h2>
         <p className="text-xl text-slate-600 mb-10">Click the button below to start the interactive call.</p>
         <button
           onClick={handleStartDemo}
-          className="px-8 py-4 bg-blue-600 text-white font-bold text-lg rounded-full hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-xl"
+          className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold text-lg rounded-full hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 shadow-xl"
         >
           ▶ Start Interactive Demo
         </button>
@@ -219,8 +222,7 @@ export default function DemoSection({ onBack }: DemoSectionProps) {
   }
 
   if (phase === 'patient-calling' || phase === 'clinic-closed' || phase === 'agent-picks-up') {
-    let icon, title;
-    switch (phase) {
+    let icon, title;    switch (phase) {
       case 'patient-calling':
         icon = <div className="w-20 h-20 bg-green-200 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse"><Phone className="w-10 h-10" /></div>;
         title = <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Patient calls...</h1>;
@@ -237,65 +239,104 @@ export default function DemoSection({ onBack }: DemoSectionProps) {
         </>;
         break;
     }
-    return <DemoLayout>{icon}{title}</DemoLayout>;
-  }  // Conversation Phase
+    return <DemoLayout>{icon}{title}</DemoLayout>;  }  // Conversation Phase
   return (
     <section className="min-h-screen bg-sky-100 text-slate-800 flex flex-col relative mt-12">
-      <StopDemoButton onStop={handleStopDemo} />
-      {/* Debug timer display */}
-      {/* <div className="absolute top-6 right-6 bg-white/80 px-3 py-1 rounded-lg text-sm font-mono z-40">
-        Timer: {demoTimer.toFixed(1)}s
-      </div> */}
-        <div ref={conversationContainerRef} className="flex-grow overflow-y-auto px-6 pb-32 pt-12">
-        <div className="space-y-6 max-w-4xl mx-auto">
-          {/* Current dialogue shown first (newest at top) */}
+      {/* Top bar with stop demo and online indicator */}
+      <div className="fixed top-6 left-6 right-6 flex justify-between items-center z-50 mt-16">
+        <button
+          onClick={handleStopDemo}
+          className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors duration-200 bg-white/90 backdrop-blur-sm rounded-lg px-4 py-3 shadow-lg border border-slate-200 hover:bg-white"
+        >
+          <XCircle className="w-5 h-5" />
+          <span className="font-medium">Stop Demo</span>
+        </button>
+        
+        <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg px-4 py-3 shadow-lg border border-slate-200">
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-4 bg-green-400 rounded-sm animate-pulse"></div>
+            <div className="w-2 h-3 bg-green-400 rounded-sm animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-2 h-5 bg-green-400 rounded-sm animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+          </div>
+          <span className="text-green-600 font-medium text-sm">Online</span>
+          {/* <div className="text-slate-400 text-sm font-mono ml-2">
+            {Math.floor(demoTimer / 60)}:{(demoTimer % 60).toFixed(1).padStart(4, '0')}
+          </div> */}
+        </div>
+      </div>
+      
+      <div ref={conversationContainerRef} className="flex-grow overflow-y-auto px-6 pb-32 pt-24">
+        <div className="space-y-8 max-w-4xl mx-auto">{/* Current dialogue shown first (newest at top) */}
           {currentDialogue && (
-            <div className="animate-fade-in-up scale-100 opacity-100 transition-all duration-500" key={`current-${nextDialogueIndex}`}>
+            <div className="animate-demo-slide-in scale-100 opacity-100 transition-all duration-700" key={`current-${nextDialogueIndex}`}>
               {(() => {
                 const isAI = currentDialogue.type === 'ai' || (currentDialogue.type === 'tool' && currentDialogue.toolResult);
                 const isPatient = currentDialogue.type === 'human';
                 const isTool = currentDialogue.type === 'tool';
                 const isSystem = currentDialogue.speaker === 'system' || currentDialogue.type === 'system';
-                
-                if (isTool && !currentDialogue.toolResult) {
-                  // Tool processing indicator - centered and highlighted
+                  if (isTool && !currentDialogue.toolResult) {
+                  // Tool processing indicator - centered box (not dialogue)
                   return (
-                    <div className="flex justify-center">
-                      <div className="bg-amber-200 border-2 border-amber-400 rounded-lg p-4 max-w-md shadow-lg">
-                        <div className="flex items-center justify-center gap-3 text-amber-900">
-                          <div className="w-3 h-3 bg-amber-500 rounded-full animate-pulse"></div>
-                          <span className="font-medium">🔧 {currentDialogue.text}</span>
+                    <div className="flex justify-center mb-6">
+                      <div className="bg-gradient-to-r from-amber-100 to-yellow-50 border-2 border-amber-300 rounded-2xl p-6 max-w-md shadow-xl">
+                        <div className="flex items-center justify-center gap-4 text-amber-800">
+                          <div className="relative">
+                            <div className="w-6 h-6 bg-amber-400 rounded-full animate-ping"></div>
+                            <div className="absolute inset-0 w-6 h-6 bg-amber-500 rounded-full animate-tool-processing"></div>
+                          </div>
+                          <div className="text-center">
+                            <div className="font-bold text-lg mb-1">⚡ Processing Tool</div>
+                            <div className="text-amber-700 text-sm">{currentDialogue.text}</div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  );
-                } else if (isSystem) {
-                  // System message - centered and highlighted
+                  );                } else if (isSystem) {
+                  // System message - styled chatbox in center
                   return (
-                    <div className="flex justify-center">
-                      <div className="bg-purple-200 border-2 border-purple-400 rounded-lg p-4 max-w-md shadow-lg">
-                        <div className="flex items-center justify-center gap-3 text-purple-900">
-                          <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                          <span className="font-medium">⚙️ {getDisplayText(currentDialogue)}</span>
+                    <div className="flex justify-center mb-6">
+                      <div className="bg-white border-2 border-indigo-300 rounded-2xl p-6 max-w-lg shadow-2xl relative overflow-hidden">
+                        {/* Decorative gradient border effect */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-2xl"></div>
+                        
+                        {/* Content */}
+                        <div className="relative z-10">
+                          <div className="flex items-center justify-center gap-3 mb-4">
+                          
+                            <div className="text-indigo-700 font-bold text-lg">⚙️ System</div>
+                          </div>
+                          
+                          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-4">
+                            <div className="text-slate-800 text-center font-medium leading-relaxed">
+                              {getDisplayText(currentDialogue)}
+                            </div>
+                          </div>
+                          
+                          {/* Bottom accent line */}
+                          <div className="mt-4 flex justify-center">
+                            <div className="w-16 h-1 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full"></div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  );
-                } else if (isAI) {
-                  // AI message - aligned right with tool info if available
+                  );} else if (isAI) {
+                  // AI message - aligned right with light theme styling
                   return (
                     <div className="flex justify-end">
                       <div className="max-w-2xl">
-                        <p className="text-blue-700 font-medium text-sm mb-1 text-right">{getDisplaySpeaker(currentDialogue)}</p>
-                        <div className="bg-blue-100 rounded-2xl rounded-tr-sm p-4 shadow-sm">
+                        <div className="flex items-center justify-end gap-2 mb-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                          <span className="text-blue-700 font-semibold text-sm">{getDisplaySpeaker(currentDialogue)}</span>
+                        </div>
+                        <div className="bg-blue-100 rounded-2xl rounded-tr-sm p-5 shadow-lg border border-blue-200">
                           <p className="text-slate-900 text-lg leading-relaxed">{getDisplayText(currentDialogue)}</p>
                         </div>
                         {/* Show tool/processing info for AI responses */}
                         {(currentDialogue as any).processing && (
-                          <div className="mt-2 text-right">
-                            <div className="inline-flex flex-wrap gap-1 justify-end">
+                          <div className="mt-3 text-right">
+                            <div className="inline-flex flex-wrap gap-2 justify-end">
                               {(currentDialogue as any).processing.map((proc: any, idx: number) => (
-                                <span key={idx} className="text-xs bg-blue-200/60 text-blue-800 px-2 py-1 rounded-full">
+                                <span key={idx} className="text-xs bg-blue-200 text-blue-800 px-3 py-1 rounded-full border border-blue-300">
                                   {proc.type}: {proc.duration}
                                 </span>
                               ))}
@@ -306,34 +347,45 @@ export default function DemoSection({ onBack }: DemoSectionProps) {
                     </div>
                   );
                 } else if (isPatient) {
-                  // Patient message - aligned left
+                  // Patient message - aligned left with light theme styling
                   return (
                     <div className="flex justify-start">
                       <div className="max-w-2xl">
-                        <p className="text-green-700 font-medium text-sm mb-1">{getDisplaySpeaker(currentDialogue)}</p>
-                        <div className="bg-green-100 rounded-2xl rounded-tl-sm p-4 shadow-sm">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-green-700 font-semibold text-sm">{getDisplaySpeaker(currentDialogue)}</span>
+                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        </div>
+                        <div className="bg-green-100 rounded-2xl rounded-tl-sm p-5 shadow-lg border border-green-200">
                           <p className="text-slate-900 text-lg leading-relaxed">{getDisplayText(currentDialogue)}</p>
                         </div>
                       </div>
                     </div>
-                  );
-                } else if (isTool && currentDialogue.toolResult) {
-                  // Tool with result - centered and highlighted
+                  );                } else if (isTool && currentDialogue.toolResult) {
+                  // Tool with result - centered box (not dialogue)
                   return (
-                    <div className="flex justify-center">
-                      <div className="max-w-2xl">
-                        <p className="text-amber-700 font-medium text-sm mb-1 text-center">🔧 Tool Result</p>
-                        <div className="bg-amber-100 border-2 border-amber-300 rounded-2xl p-4 shadow-sm">
-                          <p className="text-slate-900 text-lg leading-relaxed text-center">{getDisplayText(currentDialogue)}</p>
+                    <div className="flex justify-center mb-6">
+                      <div className="max-w-2xl w-full">
+                        <div className="text-center mb-3">
+                          <div className="inline-flex items-center gap-2 bg-amber-100 px-4 py-2 rounded-full border border-amber-300">
+                            <div className="w-3 h-3 bg-amber-500 rounded-full animate-pulse"></div>
+                            <span className="text-amber-800 font-bold text-sm">🔧 Tool Result</span>
+                          </div>
                         </div>
-                        {/* Show tool execution info */}
-                        <div className="mt-2 text-center">
-                          <div className="inline-flex flex-wrap gap-1 justify-center">
-                            <span className="text-xs bg-amber-200 text-amber-800 px-2 py-1 rounded-full">
-                              🔧 {currentDialogue.text}
+                        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
+                          <div className="text-center">
+                            <pre className="text-slate-800 text-base leading-relaxed whitespace-pre-wrap font-mono bg-white/80 p-4 rounded-xl border border-amber-200 shadow-inner">
+                              {getDisplayText(currentDialogue)}
+                            </pre>
+                          </div>
+                        </div>
+                        {/* Enhanced tool execution info */}
+                        <div className="mt-4 text-center">
+                          <div className="inline-flex flex-wrap gap-2 justify-center">
+                            <span className="text-xs bg-amber-200 text-amber-800 px-3 py-1 rounded-full border border-amber-300 font-mono">
+                              ⚡ {currentDialogue.text}
                             </span>
                             {(currentDialogue as any).processing && (currentDialogue as any).processing.map((proc: any, idx: number) => (
-                              <span key={idx} className="text-xs bg-blue-200/60 text-blue-800 px-2 py-1 rounded-full">
+                              <span key={idx} className="text-xs bg-blue-200 text-blue-800 px-3 py-1 rounded-full border border-blue-300 font-mono">
                                 {proc.type}: {proc.duration}
                               </span>
                             ))}
@@ -346,38 +398,64 @@ export default function DemoSection({ onBack }: DemoSectionProps) {
                 return null;
               })()}
             </div>
-          )}
-
-          {/* Historical dialogues (older messages below) */}
+          )}          {/* Historical dialogues (older messages below) */}
           {dialogueHistory.map((item, index) => {
             const isAI = item.type === 'ai' || (item.type === 'tool' && item.toolResult);
             const isPatient = item.type === 'human';
             const isTool = item.type === 'tool';
-            const isSystem = item.speaker === 'system' || item.type === 'system';
+            const isSystem = item.speaker === 'system' || item.type === 'tool';
             
             return (
               <div key={`history-${index}`} className="opacity-40 scale-95 transition-all duration-500">
                 {isTool && !item.toolResult ? (
-                  // Tool processing indicator - centered
+                  // Tool processing indicator - centered box
                   <div className="flex justify-center">
-                    <div className="bg-amber-200/30 border border-amber-300/40 rounded-lg p-3 max-w-md">
-                      <p className="text-amber-700 text-center text-sm">🔧 {item.text}</p>
+                    <div className="bg-gradient-to-r from-amber-50 to-yellow-25 border border-amber-200 rounded-2xl p-4 max-w-md">
+                      <div className="flex items-center justify-center gap-3 text-amber-600">
+                        <div className="w-4 h-4 bg-amber-400 rounded-full opacity-50"></div>
+                        <div className="text-center">
+                          <div className="font-medium text-sm">⚡ Processing Tool</div>
+                          <div className="text-amber-500 text-xs">{item.text}</div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ) : isSystem ? (
-                  // System message - centered
+                  </div>                ) : isSystem ? (
+                  // System message - styled chatbox (historical)
                   <div className="flex justify-center">
-                    <div className="bg-purple-200/30 border border-purple-300/40 rounded-lg p-3 max-w-md">
-                      <p className="text-purple-700 text-center text-sm">⚙️ {getDisplayText(item)}</p>
+                    <div className="bg-white/70 border border-indigo-200 rounded-2xl p-4 max-w-lg shadow-lg relative overflow-hidden">
+                      {/* Subtle decorative effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5 rounded-2xl"></div>
+                      
+                      {/* Content */}
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-center gap-2 mb-3">
+                          
+                          <div className="text-indigo-600 font-semibold text-sm">⚙️ System</div>
+                        </div>
+                        
+                        <div className="bg-gradient-to-r from-indigo-25 to-purple-25 border border-indigo-100 rounded-lg p-3">
+                          <div className="text-slate-600 text-center text-sm leading-relaxed">
+                            {getDisplayText(item)}
+                          </div>
+                        </div>
+                        
+                        {/* Bottom accent line */}
+                        <div className="mt-3 flex justify-center">
+                          <div className="w-12 h-0.5 bg-gradient-to-r from-indigo-300 to-purple-300 rounded-full opacity-50"></div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ) : isAI ? (
                   // AI message - aligned right
                   <div className="flex justify-end">
                     <div className="max-w-2xl">
-                      <p className="text-blue-400 text-sm mb-1 text-right">{getDisplaySpeaker(item)}</p>
-                      <div className="bg-blue-100/50 rounded-2xl rounded-tr-sm p-4">
-                        <p className="text-slate-500 text-base leading-relaxed">{getDisplayText(item)}</p>
+                      <div className="flex items-center justify-end gap-2 mb-1">
+                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full opacity-50"></div>
+                        <span className="text-blue-500 font-medium text-xs">{getDisplaySpeaker(item)}</span>
+                      </div>
+                      <div className="bg-blue-50 rounded-2xl rounded-tr-sm p-4 border border-blue-200">
+                        <p className="text-slate-600 text-base leading-relaxed">{getDisplayText(item)}</p>
                       </div>
                     </div>
                   </div>
@@ -385,19 +463,31 @@ export default function DemoSection({ onBack }: DemoSectionProps) {
                   // Patient message - aligned left
                   <div className="flex justify-start">
                     <div className="max-w-2xl">
-                      <p className="text-green-400 text-sm mb-1">{getDisplaySpeaker(item)}</p>
-                      <div className="bg-green-100/50 rounded-2xl rounded-tl-sm p-4">
-                        <p className="text-slate-500 text-base leading-relaxed">{getDisplayText(item)}</p>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-green-500 font-medium text-xs">{getDisplaySpeaker(item)}</span>
+                        <div className="w-1.5 h-1.5 bg-green-400 rounded-full opacity-50"></div>
+                      </div>
+                      <div className="bg-green-50 rounded-2xl rounded-tl-sm p-4 border border-green-200">
+                        <p className="text-slate-600 text-base leading-relaxed">{getDisplayText(item)}</p>
                       </div>
                     </div>
                   </div>
                 ) : isTool && item.toolResult ? (
-                  // Tool with result - centered
+                  // Tool with result - centered box
                   <div className="flex justify-center">
-                    <div className="max-w-2xl">
-                      <p className="text-amber-400 text-sm mb-1 text-center">🔧 Tool Result</p>
-                      <div className="bg-amber-100/50 border border-amber-300/40 rounded-2xl p-4">
-                        <p className="text-slate-500 text-base leading-relaxed text-center">{getDisplayText(item)}</p>
+                    <div className="max-w-2xl w-full">
+                      <div className="text-center mb-2">
+                        <div className="inline-flex items-center gap-2 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                          <div className="w-2 h-2 bg-amber-400 rounded-full opacity-50"></div>
+                          <span className="text-amber-600 font-medium text-xs">🔧 Tool Result</span>
+                        </div>
+                      </div>
+                      <div className="bg-gradient-to-br from-amber-25 to-orange-25 rounded-2xl p-4 border border-amber-200">
+                        <div className="text-center">
+                          <pre className="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap font-mono bg-white/60 p-3 rounded-lg border border-amber-100">
+                            {getDisplayText(item)}
+                          </pre>
+                        </div>
                       </div>
                     </div>
                   </div>
