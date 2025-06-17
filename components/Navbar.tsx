@@ -77,12 +77,19 @@ export default function Navbar() {
                 Support
               </Link>
             </div>
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="flex items-center space-x-4">            <button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-              Book Demo
-            </button>
+          </div>          {/* CTA Buttons */}
+          <div className="flex items-center space-x-3">
+            <Link 
+              href="https://calendly.com/kay-zenfru"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-2 border-blue-600 text-blue-600 px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-600 hover:text-white transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+            >
+              Book Call
+            </Link>
+            <Link href="/demo" className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+              View Demo
+            </Link>
           </div>
 
           {/* Mobile menu button */}

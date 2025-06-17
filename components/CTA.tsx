@@ -38,8 +38,7 @@ const CTA = () => {
                 Experience the future of dental reception with our AI-powered system that 
                 <span className="text-blue-400 font-medium"> increases bookings by 40%</span> while your team focuses on patient care.
               </p>
-              
-              {/* CTA Buttons */}
+                {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                 <Link
                   href="/demo"
