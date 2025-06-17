@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { CheckCircle, TrendingUp, Phone, Clock } from 'lucide-react';
+import { CheckCircle, TrendingUp, Phone, Clock, Target } from 'lucide-react';
 
 // Animation hook for intersection observer
 const useIntersectionObserver = (options = {}) => {
@@ -46,14 +46,7 @@ const heroStats = [
     description: 'Enhanced profitability by reducing missed opportunities and optimizing staff efficiency',
     badge: 'Profit Boost'
   },
-  {
-    label: 'Call Answer Rate',
-    value: '>90%',
-    color: 'text-blue-600',
-    icon: <Phone className="h-12 w-12 text-blue-500" />,
-    description: 'Dramatic improvement in call answer rates ensuring no patient inquiry goes unanswered',
-    badge: 'Call Success'
-  },
+  
   {
     label: 'Missed Call Reduction',
     value: '~80%',
@@ -61,6 +54,14 @@ const heroStats = [
     icon: <CheckCircle className="h-12 w-12 text-indigo-500" />,
     description: 'Substantial reduction in missed calls leading to better patient satisfaction and retention',
     badge: 'Call Management'
+  },
+  {
+    label: 'Missed Opportunities',
+    value: '0',
+    color: 'text-blue-600',
+    icon: <Target className="h-12 w-12 text-blue-500" />,
+    description: 'No missed opportunities during the pilot, ensuring every potential patient was engaged',
+    badge: 'Opportunity Capture'
   },
 ];
 
@@ -125,7 +126,7 @@ const PilotResultsSection = () => {
             isSectionVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
           }`}>
             <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 text-center md:text-left animate-gradient bg-gradient-to-r from-slate-900 via-blue-800 to-indigo-900 bg-clip-text">
-              Early results from our pilot
+              Our Results
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full flex-1">
               {heroStats.map((stat, i) => (
@@ -150,9 +151,7 @@ const PilotResultsSection = () => {
                     <div className="text-sm font-semibold text-slate-800 truncate group-hover:text-blue-700 transition-colors duration-300">
                       {stat.label}
                     </div>
-                    <div className="text-xs text-blue-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      {stat.badge}
-                    </div>
+                  
                   </div>
                 </div>
               ))}
@@ -162,7 +161,7 @@ const PilotResultsSection = () => {
         {/* Achievement Stats Bar */}
         <div 
           ref={statsRef}
-          className={`bg-white rounded-2xl shadow-lg border border-blue-100/50 p-8 backdrop-blur-sm relative overflow-hidden transition-all duration-1000 ${
+          className={`bg-white rounded-2xl shadow-lg border border-blue-100/50 p-8 backdrop-blur-sm relative overflow-hidden transition-all duration-1000 hidden ${
             isStatsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >

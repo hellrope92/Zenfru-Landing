@@ -42,21 +42,21 @@ export default function Navbar() {
           </div>          {/* Desktop Navigation */}
           <div className="hidden lg:block">
             <div className="flex items-center space-x-8">
-              <Link href="#features" className={`font-medium transition-colors ${
+              <Link href="/#features" className={`font-medium transition-colors ${
                 isScrolled 
                   ? 'text-gray-600 hover:text-gray-900' 
                   : 'text-gray-700 hover:text-gray-900'
               }`}>
                 Features
               </Link>
-              <Link href="#integration" className={`font-medium transition-colors ${
+              <Link href="/#integration" className={`font-medium transition-colors ${
                 isScrolled 
                   ? 'text-gray-600 hover:text-gray-900' 
                   : 'text-gray-700 hover:text-gray-900'
               }`}>
                 Integration
               </Link>
-              <Link href="#results" className={`font-medium transition-colors ${
+              <Link href="/#results" className={`font-medium transition-colors ${
                 isScrolled 
                   ? 'text-gray-600 hover:text-gray-900' 
                   : 'text-gray-700 hover:text-gray-900'
@@ -87,9 +87,7 @@ export default function Navbar() {
             >
               Book Call
             </Link>
-            <Link href="/demo" className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-              View Demo
-            </Link>
+         
           </div>
 
           {/* Mobile menu button */}

@@ -42,23 +42,21 @@ export default function Footer() {
                 <div className="text-xs text-gray-600">COMPLIANT</div>
               </div>
             </div>
-          </div>
-
-          {/* Navigation */}
+          </div>          {/* Navigation */}
           <div>
             <h3 className="text-sm font-semibold mb-4 text-gray-900 uppercase tracking-wider">Product</h3>
             <div className="space-y-3">
-              <Link href="#product" className="block text-gray-600 hover:text-gray-900 transition-colors text-sm">
+              <Link href="/#features" className="block text-gray-600 hover:text-gray-900 transition-colors text-sm">
                 Features
               </Link>
-              <Link href="#solutions" className="block text-gray-600 hover:text-gray-900 transition-colors text-sm">
-                Solutions
+              <Link href="/#integration" className="block text-gray-600 hover:text-gray-900 transition-colors text-sm">
+                Integration
               </Link>
-              <Link href="#customers" className="block text-gray-600 hover:text-gray-900 transition-colors text-sm">
-                Customers
+              <Link href="/#results" className="block text-gray-600 hover:text-gray-900 transition-colors text-sm">
+                Results
               </Link>
-              <Link href="#pricing" className="block text-gray-600 hover:text-gray-900 transition-colors text-sm">
-                Pricing
+              <Link href="/#faq" className="block text-gray-600 hover:text-gray-900 transition-colors text-sm">
+                FAQ
               </Link>
             </div>
           </div>
@@ -78,23 +76,7 @@ export default function Footer() {
             </div>
 
             {/* Social Links */}
-            <div>
-              <h4 className="text-sm font-semibold mb-3 text-gray-900 uppercase tracking-wider">Follow Us</h4>
-              <div className="flex space-x-3">
-                <Link href="#" className="text-gray-400 hover:text-gray-600 transition-colors">
-                  <Twitter className="w-5 h-5" />
-                  <span className="sr-only">Twitter</span>
-                </Link>
-                <Link href="#" className="text-gray-400 hover:text-gray-600 transition-colors">
-                  <Linkedin className="w-5 h-5" />
-                  <span className="sr-only">LinkedIn</span>
-                </Link>
-                <Link href="#" className="text-gray-400 hover:text-gray-600 transition-colors">
-                  <Facebook className="w-5 h-5" />
-                  <span className="sr-only">Facebook</span>
-                </Link>
-              </div>
-            </div>
+
           </div>
         </div>
 

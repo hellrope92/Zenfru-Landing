@@ -1,5 +1,6 @@
 import React from 'react';
 import Orb from './orb';
+import Link from 'next/link';
 
 interface HeroSectionProps {
   onShowDemo: () => void;
@@ -22,7 +23,7 @@ export default function HeroSection({ onShowDemo }: HeroSectionProps) {
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8 text-center">
         
-        {/* Status Badge */}
+        {/* Status Badge
         <div className="mb-8 animate-fade-in-up mt-4">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/30 backdrop-blur-sm border border-blue-200 dark:border-blue-800 rounded-full">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
@@ -30,7 +31,7 @@ export default function HeroSection({ onShowDemo }: HeroSectionProps) {
               Available 24/7 
             </span>
           </div>
-        </div>
+        </div> */}
 
         {/* Main Heading */}
         <div className="mb-8 animate-fade-in-up animation-delay-200">
@@ -58,7 +59,13 @@ export default function HeroSection({ onShowDemo }: HeroSectionProps) {
         <div className="mb-16 animate-fade-in-up animation-delay-600">
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button className="group relative px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-smooth duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-50 min-w-[200px] text-lg">
-              <span className="relative z-10">Join Waitlist</span>
+              <Link 
+              href="https://calendly.com/kay-zenfru"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Book Call
+            </Link>
             </button>
             
             <button 
@@ -69,7 +76,7 @@ export default function HeroSection({ onShowDemo }: HeroSectionProps) {
                 <svg className="w-6 h-6 group-hover:animate-bounce" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                 </svg>
-                Watch Demo
+                Watch in Action
               </span>
             </button>
           </div>
@@ -78,6 +85,12 @@ export default function HeroSection({ onShowDemo }: HeroSectionProps) {
         {/* Trust Indicators */}
         <div className="animate-fade-in-up animation-delay-800">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-x-10 gap-y-6 text-base text-slate-600 dark:text-slate-400">
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-md">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              </div>
+              <span>Available 24/7 </span>
+            </div>
             <div className="flex items-center gap-3">
               <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-md">
                 <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
