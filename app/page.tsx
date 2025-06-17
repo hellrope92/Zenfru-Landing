@@ -1,7 +1,9 @@
+"use client";
 import dynamic from "next/dynamic";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import DemoSection from "@/components/DemoSection";
 
 // Dynamic imports for sections below the fold
 const CoreValueSection = dynamic(() => import("@/components/Features"), {
@@ -35,6 +37,25 @@ const Footer = dynamic(() => import("@/components/Footer"), {
 });
 
 export default function Home() {
+  const [showDemo, setShowDemo] = useState(false);
+
+  const handleShowDemo = () => {
+    setShowDemo(true);
+  };
+
+  const handleBackToHome = () => {
+    setShowDemo(false);
+  };
+
+  if (showDemo) {
+    return (
+      <div className="min-h-screen w-full relative text-slate-900 dark:text-white">
+        <Navbar />
+        <DemoSection onBack={handleBackToHome} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen w-full relative text-slate-900 dark:text-white">
       {/* Unified Background with smooth gradients */}
@@ -50,7 +71,7 @@ export default function Home() {
       
       {/* Critical above-the-fold content */}
       <Navbar />
-      <HeroSection />
+      <HeroSection onShowDemo={handleShowDemo} />
       
       {/* Below-the-fold content with Suspense boundaries */}
         <CoreValueSection />

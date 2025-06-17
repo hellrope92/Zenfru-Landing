@@ -1,6 +1,11 @@
 import React from 'react';
 import Orb from './orb';
-export default function HeroSection() {
+
+interface HeroSectionProps {
+  onShowDemo: () => void;
+}
+
+export default function HeroSection({ onShowDemo }: HeroSectionProps) {
   return (
     <section className="relative min-h-screen max-w-100vw bg-gradient-to-br from-slate-50 via-blue-50/50 to-indigo-50 dark:from-slate-900 dark:via-blue-950/30 dark:to-indigo-950/20 overflow-hidden pt-16 pb-12">
       {/* Background Grid Pattern */}
@@ -56,7 +61,10 @@ export default function HeroSection() {
               <span className="relative z-10">Join Waitlist</span>
             </button>
             
-            <button className="group px-10 py-5 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-2 border-blue-500 dark:border-indigo-500 text-blue-600 dark:text-indigo-400 font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-smooth duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-indigo-400 focus:ring-opacity-50 min-w-[200px] text-lg">
+            <button 
+              onClick={onShowDemo}
+              className="group px-10 py-5 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-2 border-blue-500 dark:border-indigo-500 text-blue-600 dark:text-indigo-400 font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-smooth duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-indigo-400 focus:ring-opacity-50 min-w-[200px] text-lg"
+            >
               <span className="flex items-center justify-center gap-3">
                 <svg className="w-6 h-6 group-hover:animate-bounce" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />

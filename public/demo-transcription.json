@@ -1,0 +1,222 @@
+[
+  {
+    "time": 0,
+    "duration": 4,
+    "type": "ai",
+    "speaker": "Alexis (AI)",
+    "text": "Hey there, thanks for calling BrightSmile Dental Clinic. I'm Alexis, How can I help you today?"
+  },
+  {
+    "time": 4,
+    "duration": 5,
+    "type": "human",
+    "speaker": "Patient",
+    "text": "Hi, I'm having toothache in like the right side of my mouth."
+  },
+  {
+    "time": 8,
+    "duration": 9,
+    "type": "ai",
+    "speaker": "Alexis (AI)",
+    "text": "Oh no, I'm sorry to hear that you're experiencing toothache. I can help you schedule an appointment to get it checked out. Are you a new patient or have you been to our clinic before?"
+  },
+  {
+    "time": 8,
+    "duration": 1,
+    "type": "tool",
+    "speaker": "System",
+    "text": "Appointment Type",
+    "toolResult": {
+      "reason": "Toothache"
+    }
+  },
+  {
+    "time": 15,
+    "duration": 3,
+    "type": "human",
+    "speaker": "Patient",
+    "text": "A new patient."
+  },
+  {
+    "time": 19,
+    "duration": 6,
+    "type": "ai",
+    "speaker": "Alexis (AI)",
+    "text": "Okay, since this is your first time with us, could I please get your full name and date of birth?"
+  },
+  {
+    "time": 22,
+    "duration": 3,
+    "type": "human",
+    "speaker": "Patient",
+    "text": "Yep, my name is Liam Smith and I was born July 10th, 2000."
+  },
+  {
+    "time": 25,
+    "duration": 1,
+    "type": "tool",
+    "speaker": "System",
+    "text": "Patient Details",
+    "toolResult": {
+      "patient_name": "Liam Smith"
+    }
+  },
+  {
+    "time": 38,
+    "duration": 5,
+    "type": "ai",
+    "speaker": "Alexis (AI)",
+    "text": "Thank you, Liam. And could you share the best phone number to reach you at?"
+  },
+  {
+    "time": 43,
+    "duration": 8,
+    "type": "human",
+    "speaker": "Patient",
+    "text": "Yep, 804-030-2288."
+  },
+  {
+    "time": 51,
+    "duration": 1,
+    "type": "tool",
+    "speaker": "System",
+    "text": "Patient Details",
+    "toolResult": {
+      "patient_name": "Liam Smith",
+      "phone_number": "804-030-2288"
+    }
+  },
+  {
+    "time": 51,
+    "duration": 8,
+    "type": "ai",
+    "speaker": "Alexis (AI)",
+    "text": "Okay Liam, let me check our availability for an evaluation regarding your toothache. What day and general time would you prefer for your appointment?"
+  },
+  {
+    "time": 59,
+    "duration": 4,
+    "type": "human",
+    "speaker": "Patient",
+    "text": "Um, Wednesday around noon."
+  },
+  {
+    "time": 63,
+    "duration": 17,
+    "type": "ai",
+    "speaker": "Alexis (AI)",
+    "text": "Okay, Liam. Just to confirm, you're looking for an appointment for a problem focused evaluation on Wednesday around noon. Let me check that real quick for you. One moment."
+  },
+  {
+    "time": 80,
+    "duration": 17,
+    "type": "tool",
+    "speaker": "System",
+    "text": "Slot Availability",
+    "toolResult": {
+      "appointment_time": "Wednesday at 1 p.m.",
+      "doctor": "Dr. Parmar"
+    }
+  },
+  {
+    "time": 97,
+    "duration": 4,
+    "type": "human",
+    "speaker": "Patient",
+    "text": "Yup, that works."
+  },
+  {
+    "time": 101,
+    "duration": 4,
+    "type": "ai",
+    "speaker": "Alexis (AI)",
+    "text": "Perfect. And do you have dental insurance you're planning to use?"
+  },
+  {
+    "time": 105,
+    "duration": 2,
+    "type": "human",
+    "speaker": "Patient",
+    "text": "Uh yes..."
+  },
+  {
+    "time": 107,
+    "duration": 15,
+    "type": "ai",
+    "speaker": "Alexis (AI)",
+    "text": "Great. Which provider is that with? And may I also ask for the name of your employer?"
+  },
+  {
+    "time": 122,
+    "duration": 1,
+    "type": "human",
+    "speaker": "Patient",
+    "text": "Cognizant."
+  },
+  {
+    "time": 123,
+    "duration": 4,
+    "type": "ai",
+    "speaker": "Alexis (AI)",
+    "text": "Got it. And which provider is your insurance with?"
+  },
+  {
+    "time": 127,
+    "duration": 1,
+    "type": "human",
+    "speaker": "Patient",
+    "text": "Cigna."
+  },
+  {
+    "time": 128,
+    "duration": 9,
+    "type": "ai",
+    "speaker": "Alexis (AI)",
+    "text": "Okay, one moment. To help make your first visit as smooth as possible, I can send you a link to our new patient forms. Would you like me to send that link to the phone number you provided?"
+  },
+  {
+    "time": 137,
+    "duration": 1,
+    "type": "human",
+    "speaker": "Patient",
+    "text": "Yep."
+  },
+  {
+    "time": 138,
+    "duration": 25,
+    "type": "tool",
+    "speaker": "System",
+    "text": "New Patient Form Sent",
+    "toolResult": {
+      "confirmation": "Form sent to 804-030-2288",
+      "summary": {
+        "name": "Liam Smith",
+        "phone": "804-030-2288",
+        "appointment": "Wednesday at 1 p.m. with Dr. Parmar",
+        "insurance_provider": "Cigna",
+        "employer": "Cognizant"
+      }
+    }
+  },
+  {
+    "time": 163,
+    "duration": 1,
+    "type": "ai",
+    "speaker": "Alexis (AI)",
+    "text": "Okay, Liam, I've sent the new patient form to your phone number. Before I finalize your appointment, could I please reconfirm all the details for you? Your full name is Liam Smith, and the best phone number to reach you at is eight zero four, zero three zero, two two eight eight. Your appointment for a problem focused evaluation is scheduled for Wednesday at one p.m. with Doctor Parmar. And regarding your insurance, you mentioned Cigna with employer Cognizant. Is all of that correct?"
+  },
+  {
+    "time": 164,
+    "duration": 3,
+    "type": "human",
+    "speaker": "Patient",
+    "text": "Yep"
+  },
+  {
+    "time": 167,
+    "duration": 2,
+    "type": "ai",
+    "speaker": "Alexis (AI)",
+    "text": "Thanks for chatting! Take care!"
+  }
+]
