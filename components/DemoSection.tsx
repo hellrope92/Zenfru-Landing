@@ -19,7 +19,7 @@ interface DemoSectionProps {
 const StopDemoButton = ({ onStop }: { onStop: () => void }) => (
   <button
     onClick={onStop}
-    className="absolute top-6 left-6 flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors duration-200 z-50 mt-12"
+    className="fixed top-6 left-6 flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors duration-200 z-50 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg border border-slate-200 mt-16"
   >
     <XCircle className="w-6 h-6 " />
     <span className="font-medium">Stop Demo</span>
@@ -194,7 +194,7 @@ export default function DemoSection({ onBack }: DemoSectionProps) {
 
   // Common layout for pre-conversation phases
   const DemoLayout = ({ children }: { children: React.ReactNode }) => (
-    <section className="min-h-screen bg-sky-100 text-slate-800 flex items-center justify-center relative p-6">
+    <section className="min-h-screen bg-sky-100 text-slate-800 flex items-center justify-center relative p-6 ">
       <StopDemoButton onStop={handleStopDemo} />
       <div className="text-center max-w-3xl mx-auto animate-fade-in-up ">
         {children}
@@ -238,17 +238,15 @@ export default function DemoSection({ onBack }: DemoSectionProps) {
         break;
     }
     return <DemoLayout>{icon}{title}</DemoLayout>;
-  }
-  // Conversation Phase
+  }  // Conversation Phase
   return (
-    <section className="min-h-screen bg-sky-100 text-slate-800 flex flex-col relative">
-      <div className="px-6 pt-6">
-        <StopDemoButton onStop={handleStopDemo} />
-        {/* Debug timer display */}
-        <div className="absolute top-6 right-6 bg-white/80 px-3 py-1 rounded-lg text-sm font-mono">
-          Timer: {demoTimer.toFixed(1)}s
-        </div>
-      </div>        <div ref={conversationContainerRef} className="flex-grow overflow-y-auto px-6 pb-32 pt-12 mt-12 md:mt-0">
+    <section className="min-h-screen bg-sky-100 text-slate-800 flex flex-col relative mt-12">
+      <StopDemoButton onStop={handleStopDemo} />
+      {/* Debug timer display */}
+      {/* <div className="absolute top-6 right-6 bg-white/80 px-3 py-1 rounded-lg text-sm font-mono z-40">
+        Timer: {demoTimer.toFixed(1)}s
+      </div> */}
+        <div ref={conversationContainerRef} className="flex-grow overflow-y-auto px-6 pb-32 pt-12">
         <div className="space-y-6 max-w-4xl mx-auto">
           {/* Current dialogue shown first (newest at top) */}
           {currentDialogue && (
