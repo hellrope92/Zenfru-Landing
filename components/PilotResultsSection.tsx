@@ -35,13 +35,13 @@ const heroStats = [
     value: '10-15%',
     color: 'text-blue-600',
     icon: <TrendingUp className="h-12 w-12 text-blue-500" />,
-    description: 'Significant increase in monthly revenues through improved call handling and patient retention',
+    description: 'Significant increase in monthly revenues through improved call handling and client retention',
     badge: 'Revenue Growth'
   },
   {
     label: 'Monthly Profit Increase',
     value: '20-25%',
-    color: 'text-indigo-600',
+    color: 'text-blue-600',
     icon: <TrendingUp className="h-12 w-12 text-indigo-500" />,
     description: 'Enhanced profitability by reducing missed opportunities and optimizing staff efficiency',
     badge: 'Profit Boost'
@@ -49,10 +49,10 @@ const heroStats = [
   
   {
     label: 'Missed Call Reduction',
-    value: '~80%',
-    color: 'text-indigo-600',
+    value: '~100%',
+    color: 'text-blue-600',
     icon: <CheckCircle className="h-12 w-12 text-indigo-500" />,
-    description: 'Substantial reduction in missed calls leading to better patient satisfaction and retention',
+    description: 'Substantial reduction in missed calls leading to better client satisfaction and retention',
     badge: 'Call Management'
   },
   {
@@ -60,7 +60,7 @@ const heroStats = [
     value: '0',
     color: 'text-blue-600',
     icon: <Target className="h-12 w-12 text-blue-500" />,
-    description: 'No missed opportunities during the pilot, ensuring every potential patient was engaged',
+    description: 'No missed opportunities during the pilot, ensuring every potential client was engaged',
     badge: 'Opportunity Capture'
   },
 ];

@@ -29,14 +29,14 @@ const CTA = () => {
                 </span>
                 <br />
                 <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent animate-gradient">
-                  Dental Practice
+                  Business Workflow
                 </span>
               </h2>
               
               {/* Subtitle */}
               <p className="text-lg md:text-xl text-gray-300 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
-                Experience the future of dental reception with our AI-powered system that 
-                <span className="text-blue-400 font-medium"> increases bookings by 40%</span> while your team focuses on patient care.
+                Experience the future of reception with our AI-powered system that 
+                <span className="text-blue-400 font-medium"> increases bookings by 40%</span> while working alongside your team.
               </p>
                 {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">

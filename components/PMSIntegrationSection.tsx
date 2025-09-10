@@ -26,6 +26,11 @@ function useScrollReveal<T extends HTMLElement = HTMLElement>(options?: Intersec
 const PMSIntegrationSection = () => {
   const pmsProviders = [
     {
+      name: "HubSpot",
+      logo: "/logos/hubspot.png",
+      alt: "HubSpot CRM Software"
+    },
+    {
       name: "Dentrix",
       logo: "/logos/dentrix.png",
       alt: "Dentrix Practice Management Software"
@@ -34,6 +39,11 @@ const PMSIntegrationSection = () => {
       name: "Eaglesoft",
       logo: "/logos/eaglesoft.png", 
       alt: "Eaglesoft Practice Management Software"
+    },
+    {
+      name: "zendesk",
+      logo: "/logos/zendesk.png",
+      alt: "Zendesk Customer Service Software"
     },
     {
       name: "OpenDental",
@@ -46,26 +56,25 @@ const PMSIntegrationSection = () => {
       alt: "Weave Practice Management Platform"
     },
     {
-      name: "Curve",
-      logo: "/logos/curve.png",
-      alt: "Curve Practice Management Software"
+      name: "Housecall Pro",
+      logo: "/logos/housecallpro.png",
+      alt: "Housecall Pro Practice Management Software"
     },
     {
       name: "Softdent",
       logo: "/logos/softdent.png",
       alt: "Softdent Practice Management Software"
     },
-     {
-      name: "Planet DDS",
-      logo: "/logos/planetdds.png",
-      alt: "Planet DDS Practice Management Software"
+    {
+      name: "Zoho CRM",
+      logo: "/logos/zoho.png",
+      alt: "Zoho CRM Software"
     },
     {
-      name: "Carestream",
-      logo: "/logos/carestream.jpg",
-      alt: "Carestream Dental Practice Management Software"
+      name: "Mindbody",
+      logo: "/logos/mindbody.png",
+      alt: "Mindbody Wellness Software"
     }
-
   ];  
   const headingRef = useScrollReveal<HTMLHeadingElement>();
   const subtitleRef = useScrollReveal<HTMLParagraphElement>({ rootMargin: '-40px' });
@@ -82,7 +91,7 @@ const PMSIntegrationSection = () => {
             <span className="block text-blue-600 font-bold">your existing workflow</span>
           </h2>
           <p ref={subtitleRef} className="fade-in-up-on-scroll text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Connect with your current practice management system in minutes.
+            Connect with your current CRM, PMS or custom database system with ease.
             Zero disruption, maximum enhancement.
           </p>
         </div>
@@ -123,8 +132,8 @@ const PMSIntegrationSection = () => {
             <h2 ref={whyHeadingRef} className="fade-in-up-on-scroll text-3xl md:text-4xl font-semibold text-gray-900 mb-6 tracking-tight">
               <span className="block text-blue-600 font-bold">Why services like Zenfru?</span>
             </h2>
-            <p ref={whySubtitleRef} className="fade-in-up-on-scroll text-gray-600 max-w-xl mx-auto">
-              Built for dental professionals who value efficiency and reliability
+            <p ref={whySubtitleRef} className="fade-in-up-on-scroll text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              For teams that put their clients first, even when their staff has signed off.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -138,9 +147,9 @@ const PMSIntegrationSection = () => {
                       </svg>
                     </div>
                   </div>
-                  <h4 className="text-xl font-semibold text-gray-900 mb-3">5-minute setup</h4>
+                  <h4 className="text-xl font-semibold text-gray-900 mb-3">Quick setup</h4>
                   <p className="text-gray-600 leading-relaxed">
-                    Simple API connection that works with your existing workflow. No IT department required.
+                    Simple setup that works with your existing workflow. No IT department required.
                   </p></>) }
                 {i === 1 && (
                   <><div className="mb-6">
@@ -152,7 +161,7 @@ const PMSIntegrationSection = () => {
                   </div>
                   <h4 className="text-xl font-semibold text-gray-900 mb-3">Live synchronization</h4>
                   <p className="text-gray-600 leading-relaxed">
-                    Patient appointments and data sync in real-time. Your team sees updates instantly.
+                    Client appointments and data sync in real-time. Your team sees updates instantly.
                   </p></>) }
                 {i === 2 && (
                   <><div className="mb-6">
@@ -164,7 +173,7 @@ const PMSIntegrationSection = () => {
                   </div>
                   <h4 className="text-xl font-semibold text-gray-900 mb-3">Enterprise security</h4>
                   <p className="text-gray-600 leading-relaxed">
-                    HIPAA-compliant architecture with end-to-end encryption. Your patient data stays protected.
+                    Legally-compliant architecture with end-to-end encryption. Your client data stays protected.
                   </p></>) }
               </div>
             ))}

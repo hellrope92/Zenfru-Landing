@@ -34,20 +34,32 @@ const CoreValueSection = () => {
     {
       title: 'Emergency triage',
       description: 'Escalations and non-urgent cases are identified and routed seamlessly, day or night.',
-      imageSrc: '/Zenfru2.png',
+      imageSrc: '/Zenfru0.png',
       imageAlt: 'Emergency triage illustration',
     },
     {
-      title: 'HIPAA-compliant security',
-      description: 'Patient info stays private with end-to-end encryption and safe data practices.',
+      title: 'Legally-compliant security',
+      description: 'Client info stays private with end-to-end encryption and safe data practices.',
       imageSrc: '/Zenfru3.png',
-      imageAlt: 'HIPAA-compliant security illustration',
+      imageAlt: 'Legally-compliant security illustration',
     },
     {
-      title: 'Practice Info On-Demand',
-      description: 'Instantly provides clinic details (location, hours, insurance) and automatically sends new patient intake forms via text.',
-      imageSrc: '/Zenfru4.png', 
-      imageAlt: 'Practice info on-demand illustration',
+      title: 'Business Info On-Demand',
+      description: 'Instantly provides business details (location, hours, insurance) to callers, reducing wait times and improving satisfaction.',
+      imageSrc: '/Zenfru4.png',
+      imageAlt: 'Business info on-demand illustration',
+    },
+    {
+      title: 'Daily summaries & insights',
+      description: 'We provide daily summaries of all interactions that the AI handled while your team was away, along with important next steps.',
+      imageSrc: '/Zenfru6.png',
+      imageAlt: 'Summaries and insights illustration',
+    },
+    {
+      title: 'Have another AI use case?',
+      description: 'Zenfru offers custom AI solutions that solve your specific business problems. Book a free AI consultation for your business today!',
+      imageSrc: '/Zenfru10.png',
+      imageAlt: 'Custom AI solutions illustration',
     }
   ];
 
@@ -64,7 +76,7 @@ const CoreValueSection = () => {
           ref={subtitleRef}
           className="fade-in-up-on-scroll text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-8"
         >
-          "Never miss a patient call again — even when you're closed"
+          "Never miss a client call again — even when you're closed"
         </p>
         <div className="relative max-w-5xl mx-auto">
           {features.map((feature, index) => (
@@ -87,6 +99,21 @@ const CoreValueSection = () => {
                 <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-lg">
                   {feature.description}
                 </p>
+                {index === features.length - 1 && (
+                  <a
+                    href="https://calendly.com/kay-zenfru"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-6 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-smooth duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-50 min-w-[200px] text-lg"
+                  >
+                    Book AI Consultation
+                    <span className="inline-block align-middle ml-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 12H6.75m6 6 6-6-6-6" />
+                      </svg>
+                    </span>
+                  </a>
+                )}
               </div>
               {/* Image Content */}
               <div className="md:w-1/2 flex justify-center items-center p-6 bg-gradient-to-br from-blue-50/80 to-indigo-50/80 dark:from-blue-950/50 dark:to-indigo-950/50 backdrop-blur-sm border border-blue-200/30 dark:border-blue-800/30 rounded-xl shadow-xl hover:shadow-2xl transition-smooth duration-500 aspect-square max-w-md w-full overflow-hidden group">

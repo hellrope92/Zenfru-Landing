@@ -23,7 +23,7 @@ export default function Footer() {
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
             </div>
             <p className="text-gray-600 mb-6 leading-relaxed max-w-md">
-              Zenfru is HIPAA compliant and secure. Trusted by dental practices across the US and Canada for streamlined patient management.
+              Zenfru is legally compliant and secure. Trusted by businesses across the US and Canada for streamlined client management.
             </p>
             
             {/* Contact Info */}
@@ -32,16 +32,6 @@ export default function Footer() {
               <span className="text-gray-600">info@zenfru.com</span>
             </div>
 
-            {/* HIPAA Badge */}
-            <div className="flex items-center space-x-3 bg-blue-50 rounded-lg px-4 py-3 w-fit">
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">H</span>
-              </div>
-              <div>
-                <div className="text-xs text-blue-600 uppercase tracking-wider font-medium">HIPAA</div>
-                <div className="text-xs text-gray-600">COMPLIANT</div>
-              </div>
-            </div>
           </div>          {/* Navigation */}
           <div>
             <h3 className="text-sm font-semibold mb-4 text-gray-900 uppercase tracking-wider">Product</h3>
