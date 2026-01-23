@@ -1,20 +1,44 @@
+export interface TranscriptMessage {
+  role: "agent" | "user";
+  message: string;
+  tool_calls: any;
+  tool_results: any;
+  feedback: any;
+  time_in_call_secs: number;
+  conversation_turn_metrics: any;
+}
+
 export interface CallData {
   _id?: string;
-  callId: string;
-  duration: number;
+  conversationId: string;
+  agentId: string;
+  userId: string;
   status: string;
-  startTime: string | Date;
-  endTime: string | Date;
-  transcript: string;
-  audioUrl: string;
+  transcript: TranscriptMessage[];
   metadata: {
-    from: string;
-    to: string;
-    direction: string;
-    rawData: any;
+    startTime: Date;
+    duration: number;
+    cost: number;
+    terminationReason: string;
+    feedback: {
+      overall_score: number | null;
+      likes: number;
+      dislikes: number;
+    };
   };
+  analysis: {
+    callSuccessful: string;
+    summary: string;
+    evaluationResults: any;
+    dataCollectionResults: any;
+  };
+  conversationInitiationData: any;
+  eventTimestamp: Date;
   createdAt: Date;
-  userId?: string | null;
+  hasAudio: boolean;
+  audioBase64?: string;
+  audioUrl?: string | null;
+  audioReceivedAt?: Date;
 }
 
 export interface CallAnalytics {
