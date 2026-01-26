@@ -13,7 +13,14 @@ export interface CallData {
   conversationId: string;
   agentId: string;
   userId: string;
+  elevenLabsUserId?: string;
   status: string;
+  callerName: string;
+  callerNumber: string;
+  callType: "inbound" | "outbound";
+  callAttempt: number;
+  callPurpose: string;
+  callOutcome?: "Booked" | "Engaged" | "Call Back" | string;
   transcript: TranscriptMessage[];
   metadata: {
     startTime: Date;

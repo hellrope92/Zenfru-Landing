@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const { MongoClient } = require('mongodb');
 
-const MONGODB_URI = "mongodb+srv://krittika_bisht_019:OtX8gpqGoY01AwHu@cluster0.8rpxjum.mongodb.net/";
+const MONGODB_URI = "mongodb+srv://admin:Dentalai25@zenfru.3cejkij.mongodb.net/?retryWrites=true&w=majority&appName=Zenfru";
 const email = "krittikabisht019@gmail.com";
 const password = "krittika019";
 const name = "Krittika";
@@ -16,11 +16,11 @@ async function createUser() {
     const client = await MongoClient.connect(MONGODB_URI);
     console.log('Connected to MongoDB');
 
-    const db = client.db();
+    const db = client.db("demo_dashboard");
     
     // Insert user
     const result = await db.collection('users').insertOne({
-      email: email,
+      email: email.toLowerCase(),
       password: hashedPassword,
       name: name,
       createdAt: new Date()

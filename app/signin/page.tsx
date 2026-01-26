@@ -174,8 +174,8 @@ export default function SignIn() {
         </div>
 
         {/* Right side - Image */}
-        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-100 to-blue-50 items-center justify-end p-12 pr-16 pb-20">
-          <div className="relative w-full h-full max-w-3xl max-h-[700px]">
+        <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-blue-100 to-blue-50 items-center justify-end p-12 pr-16 pb-20">
+          <div className="relative w-full h-full max-w-3xl max-h-175">
             <Image
               src="/Zenfru10.png"
               alt="AI Receptionist"

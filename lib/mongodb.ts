@@ -31,3 +31,6 @@ if (process.env.NODE_ENV === "development") {
 // Export a module-scoped MongoClient promise. By doing this in a
 // separate module, the client can be shared across functions.
 export default clientPromise;
+
+// Export database name for easy access
+export const dbName = process.env.MONGODB_DB_NAME || "demo_dashboard";
