@@ -5,6 +5,18 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const preferredRegion = 'auto';
 
+// Handle OPTIONS for CORS preflight
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-elevenlabs-signature',
+    },
+  });
+}
+
 export async function POST(req: NextRequest) {
   console.log("========================================");
   console.log("WEBHOOK POST RECEIVED");
@@ -118,7 +130,12 @@ export async function POST(req: NextRequest) {
           message: "Transcription data received and stored",
           conversationId: body.data.conversation_id
         },
-        { status: 200 }
+        { 
+          status: 200,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+          }
+        }
       );
 
     } else if (body.type === "post_call_audio") {
@@ -150,7 +167,12 @@ export async function POST(req: NextRequest) {
           message: "Audio data received and stored",
           conversationId: body.data.conversation_id
         },
-        { status: 200 }
+        { 
+          status: 200,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+          }
+        }
       );
 
     } else {
