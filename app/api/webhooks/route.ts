@@ -3,12 +3,18 @@ import clientPromise, { dbName } from '@/lib/mongodb';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const preferredRegion = 'auto';
 
 export async function POST(req: NextRequest) {
+  console.log("========================================");
+  console.log("WEBHOOK POST RECEIVED");
+  console.log("Time:", new Date().toISOString());
+  console.log("Method:", req.method);
+  console.log("URL:", req.url);
+  console.log("Headers:", Object.fromEntries(req.headers.entries()));
+  console.log("========================================");
+  
   try {
-    console.log("=== Webhook POST received ===");
-    console.log("Method:", req.method);
-    console.log("URL:", req.url);
     
     // Log headers for debugging
     const webhookSecret = req.headers.get("x-elevenlabs-signature") || req.headers.get("authorization");
@@ -25,8 +31,13 @@ export async function POST(req: NextRequest) {
     // }
 
     const body = await req.json();
-    console.log("Webhook type:", body.type);
-    console.log("Full webhook payload:", JSON.stringify(body, null, 2));
+    console.log("========================================");
+    console.log("WEBHOOK BODY RECEIVED");
+    console.log("Type:", body.type);
+    console.log("Has data:", !!body.data);
+    console.log("Conversation ID:", body.data?.conversation_id);
+    console.log("Full payload keys:", Object.keys(body));
+    console.log("========================================");
     
     // Connect to MongoDB
     const client = await clientPromise;
@@ -93,7 +104,12 @@ export async function POST(req: NextRequest) {
         console.log("✅ Call transcription updated:", body.data.conversation_id);
       } else {
         const result = await db.collection("calls").insertOne(callData);
-        console.log("✅ Call transcription saved:", body.data.conversation_id, "Insert ID:", result.insertedId);
+        console.log("========================================");
+        console.log("✅ NEW CALL INSERTED");
+        console.log("Conversation ID:", body.data.conversation_id);
+        console.log("Insert ID:", result.insertedId);
+        console.log("User ID:", dbUserId);
+        console.log("========================================");
       }
 
       return NextResponse.json(
@@ -150,11 +166,16 @@ export async function POST(req: NextRequest) {
     }
 
   } catch (error) {
-    console.error("Webhook error:", error);
+    console.error("========================================");
+    console.error("!!! WEBHOOK ERROR !!!");
+    console.error("Error:", error);
+    console.error("Stack:", error instanceof Error ? error.stack : "No stack");
+    console.error("========================================");
     return NextResponse.json(
       { 
         success: false, 
-        error: "Failed to process webhook data" 
+        error: "Failed to process webhook data",
+        details: error instanceof Error ? error.message : "Unknown error"
       },
       { status: 500 }
     );
