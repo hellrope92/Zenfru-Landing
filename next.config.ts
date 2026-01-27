@@ -21,6 +21,9 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   
+  // Disable trailing slash redirects for API routes
+  skipTrailingSlashRedirect: true,
+  
   // Static optimization
   output: 'standalone',
   

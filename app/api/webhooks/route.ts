@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise, { dbName } from '@/lib/mongodb';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   try {
-    console.log("=== Webhook received ===");
+    console.log("=== Webhook POST received ===");
+    console.log("Method:", req.method);
+    console.log("URL:", req.url);
     
     // Log headers for debugging
     const webhookSecret = req.headers.get("x-elevenlabs-signature") || req.headers.get("authorization");
@@ -158,8 +163,14 @@ export async function POST(req: NextRequest) {
 
 // Handle GET requests (for webhook verification)
 export async function GET(req: NextRequest) {
+  console.log("=== Webhook GET request ===");
+  console.log("URL:", req.url);
   return NextResponse.json(
-    { message: "ElevenLabs webhook endpoint is active" },
+    { 
+      message: "ElevenLabs webhook endpoint is active",
+      timestamp: new Date().toISOString(),
+      url: req.url
+    },
     { status: 200 }
   );
 }
