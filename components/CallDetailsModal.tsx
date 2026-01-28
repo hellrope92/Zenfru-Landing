@@ -136,6 +136,21 @@ function CallDetailsModal({ call, onClose }: CallDetailsModalProps) {
             </div>
           </div>
 
+          {/* AI Summary */}
+          {call.analysis?.summary && (
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <span className="text-purple-600">✨</span>
+                <h3 className="text-sm font-medium text-gray-900">AI Summary</h3>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  {call.analysis.summary}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Message Transcript */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
@@ -164,21 +179,6 @@ function CallDetailsModal({ call, onClose }: CallDetailsModalProps) {
               ))}
             </div>
           </div>
-
-          {/* AI Summary */}
-          {call.analysis?.summary && (
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <span className="text-purple-600">✨</span>
-                <h3 className="text-sm font-medium text-gray-900">AI Summary</h3>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-4">
-                <p className="text-sm text-gray-700 leading-relaxed">
-                  {call.analysis.summary}
-                </p>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

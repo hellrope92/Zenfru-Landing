@@ -68,6 +68,84 @@ export async function POST(req: NextRequest) {
       
       console.log("Linking call to user:", defaultUser?.email);
 
+      // Helper function to extract caller info from transcript
+      const extractCallerInfo = (transcript: any[], summary: string) => {
+        let callerName = "Unknown Caller";
+        let callerNumber = "N/A";
+        
+        // Try to extract from transcript messages
+        if (transcript && transcript.length > 0) {
+          const transcriptText = transcript.map(t => t.message).join(" ");
+          
+          // Look for name patterns (case insensitive)
+          const nameMatch = transcriptText.match(/(?:my name is|I'm|I am|this is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
+          if (nameMatch && nameMatch[1]) {
+            callerName = nameMatch[1].trim();
+          }
+          
+          // Look for phone number patterns
+          const phoneMatch = transcriptText.match(/(\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\(\d{3}\)\s?\d{3}[-.\s]?\d{4})/);
+          if (phoneMatch && phoneMatch[1]) {
+            callerNumber = phoneMatch[1];
+          }
+        }
+        
+        // Also try from summary
+        if (summary) {
+          const nameInSummary = summary.match(/(?:patient|caller|customer)\s+(?:named|called)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
+          if (nameInSummary && nameInSummary[1] && callerName === "Unknown Caller") {
+            callerName = nameInSummary[1].trim();
+          }
+          
+          const phoneInSummary = summary.match(/(\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\(\d{3}\)\s?\d{3}[-.\s]?\d{4})/);
+          if (phoneInSummary && phoneInSummary[1] && callerNumber === "N/A") {
+            callerNumber = phoneInSummary[1];
+          }
+        }
+        
+        return { callerName, callerNumber };
+      };
+
+      // Helper function to determine call purpose from summary
+      const determineCallPurpose = (summary: string) => {
+        if (!summary) return "General Inquiry";
+        
+        const lowerSummary = summary.toLowerCase();
+        
+        // Check for common purposes
+        if (lowerSummary.includes("appointment") || lowerSummary.includes("schedule") || lowerSummary.includes("booking")) {
+          return "Appointment Scheduling";
+        } else if (lowerSummary.includes("reschedule") || lowerSummary.includes("change appointment")) {
+          return "Reschedule Appointment";
+        } else if (lowerSummary.includes("cancel")) {
+          return "Cancel Appointment";
+        } else if (lowerSummary.includes("emergency") || lowerSummary.includes("urgent") || lowerSummary.includes("pain")) {
+          return "Emergency/Urgent Care";
+        } else if (lowerSummary.includes("insurance") || lowerSummary.includes("billing") || lowerSummary.includes("payment")) {
+          return "Billing/Insurance Inquiry";
+        } else if (lowerSummary.includes("prescription") || lowerSummary.includes("medication") || lowerSummary.includes("refill")) {
+          return "Prescription/Medication";
+        } else if (lowerSummary.includes("results") || lowerSummary.includes("test")) {
+          return "Test Results";
+        } else if (lowerSummary.includes("new patient") || lowerSummary.includes("first visit")) {
+          return "New Patient Inquiry";
+        } else if (lowerSummary.includes("question") || lowerSummary.includes("inquiry") || lowerSummary.includes("information")) {
+          return "General Inquiry";
+        } else {
+          return "Other";
+        }
+      };
+
+      // Extract summary and transcript
+      const summary = body.data.analysis?.transcript_summary || "";
+      const transcript = body.data.transcript || [];
+      
+      // Extract caller info from transcript and summary
+      const { callerName, callerNumber } = extractCallerInfo(transcript, summary);
+      
+      // Determine call purpose from summary
+      const callPurpose = determineCallPurpose(summary);
+
       // Extract transcription data
       const callData = {
         conversationId: body.data.conversation_id,
@@ -75,12 +153,12 @@ export async function POST(req: NextRequest) {
         userId: dbUserId, // Link to our database user
         elevenLabsUserId: body.data.user_id, // Store original ElevenLabs user_id
         status: body.data.status,
-        callerName: body.data.conversation_initiation_client_data?.dynamic_variables?.user_name || "Unknown Caller",
-        callerNumber: body.data.conversation_initiation_client_data?.dynamic_variables?.phone_number || "N/A",
+        callerName: callerName,
+        callerNumber: callerNumber,
         callType: body.data.conversation_initiation_client_data?.dynamic_variables?.call_type || "inbound",
         callAttempt: body.data.conversation_initiation_client_data?.dynamic_variables?.attempt_number || 1,
-        callPurpose: body.data.conversation_initiation_client_data?.dynamic_variables?.call_purpose || "General Inquiry",
-        transcript: body.data.transcript,
+        callPurpose: callPurpose,
+        transcript: transcript,
         metadata: {
           startTime: new Date(body.data.metadata.start_time_unix_secs * 1000),
           duration: body.data.metadata.call_duration_secs,
