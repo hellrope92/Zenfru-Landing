@@ -7,12 +7,18 @@ import { signOut } from "next-auth/react";
 import { CallData } from "@/types/call";
 import CallDetailsModal from "../../components/CallDetailsModal";
 
+type DateFilter = "today" | "lastWeek" | "lastMonth" | "6months" | "custom";
+
 export default function Dashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [calls, setCalls] = useState<CallData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCall, setSelectedCall] = useState<CallData | null>(null);
+  const [dateFilter, setDateFilter] = useState<DateFilter>("today");
+  const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -25,6 +31,64 @@ export default function Dashboard() {
       fetchCalls();
     }
   }, [status]);
+
+  const getDateFilterRange = () => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    switch (dateFilter) {
+      case "today":
+        return { start: today, end: new Date() };
+      
+      case "lastWeek":
+        const lastWeek = new Date(today);
+        lastWeek.setDate(lastWeek.getDate() - 7);
+        return { start: lastWeek, end: new Date() };
+      
+      case "lastMonth":
+        const lastMonth = new Date(today);
+        lastMonth.setMonth(lastMonth.getMonth() - 1);
+        return { start: lastMonth, end: new Date() };
+      
+      case "6months":
+        const sixMonths = new Date(today);
+        sixMonths.setMonth(sixMonths.getMonth() - 6);
+        return { start: sixMonths, end: new Date() };
+      
+      case "custom":
+        if (customStartDate && customEndDate) {
+          return { 
+            start: new Date(customStartDate), 
+            end: new Date(customEndDate + "T23:59:59") 
+          };
+        }
+        return null;
+      
+      default:
+        return { start: today, end: new Date() };
+    }
+  };
+
+  const filteredCalls = calls.filter(call => {
+    const dateRange = getDateFilterRange();
+    if (!dateRange) return true;
+    
+    const callDate = new Date(call.metadata.startTime);
+    return callDate >= dateRange.start && callDate <= dateRange.end;
+  });
+
+  const getDateFilterLabel = () => {
+    switch (dateFilter) {
+      case "today": return "Today";
+      case "lastWeek": return "Last Week";
+      case "lastMonth": return "Last Month";
+      case "6months": return "Last 6 Months";
+      case "custom": return customStartDate && customEndDate 
+        ? `${customStartDate} to ${customEndDate}` 
+        : "Custom Range";
+      default: return "Today";
+    }
+  };
 
   const fetchCalls = async () => {
     try {
@@ -53,15 +117,15 @@ export default function Dashboard() {
   }
 
   // Calculate analytics
-  const totalCalls = calls.length;
-  const engagements = calls.filter(c => 
+  const totalCalls = filteredCalls.length;
+  const engagements = filteredCalls.filter(c => 
     c.analysis?.callSuccessful === "success"
   ).length;
 
   // Call outcomes - Booked, Engaged, Call Back
-  const booked = calls.filter(c => c.callOutcome === "Booked").length;
-  const engaged = calls.filter(c => c.callOutcome === "Engaged").length;
-  const callBack = calls.filter(c => c.callOutcome === "Call Back").length;
+  const booked = filteredCalls.filter(c => c.callOutcome === "Booked").length;
+  const engaged = filteredCalls.filter(c => c.callOutcome === "Engaged").length;
+  const callBack = filteredCalls.filter(c => c.callOutcome === "Call Back").length;
 
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -87,21 +151,117 @@ export default function Dashboard() {
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">AI</span>
-            </div>
-            <h1 className="text-xl font-semibold text-gray-900">AI Receptionist</h1>
+            <img
+              src="/logo.png"
+              alt="Zenfru"
+              className="h-12 w-auto"
+            />
           </div>
           <div className="flex items-center space-x-4">
-            <button className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900 flex items-center space-x-2">
-              <span>📅</span>
-              <span>Today</span>
-            </button>
+            <div className="relative">
+              <button 
+                onClick={() => setShowDateDropdown(!showDateDropdown)}
+                className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900 flex items-center space-x-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                <span>{getDateFilterLabel()}</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {showDateDropdown && (
+                <div className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                  <div className="py-1">
+                    <button
+                      onClick={() => {
+                        setDateFilter("today");
+                        setShowDateDropdown(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
+                        dateFilter === "today" ? "bg-purple-50 text-purple-600" : "text-gray-700"
+                      }`}
+                    >
+                      Today
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDateFilter("lastWeek");
+                        setShowDateDropdown(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
+                        dateFilter === "lastWeek" ? "bg-purple-50 text-purple-600" : "text-gray-700"
+                      }`}
+                    >
+                      Last Week
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDateFilter("lastMonth");
+                        setShowDateDropdown(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
+                        dateFilter === "lastMonth" ? "bg-purple-50 text-purple-600" : "text-gray-700"
+                      }`}
+                    >
+                      Last Month
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDateFilter("6months");
+                        setShowDateDropdown(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
+                        dateFilter === "6months" ? "bg-purple-50 text-purple-600" : "text-gray-700"
+                      }`}
+                    >
+                      Last 6 Months
+                    </button>
+                    <div className="border-t border-gray-200 mt-1 pt-1">
+                      <button
+                        onClick={() => setDateFilter("custom")}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
+                          dateFilter === "custom" ? "bg-purple-50 text-purple-600" : "text-gray-700"
+                        }`}
+                      >
+                        Custom Range
+                      </button>
+                      {dateFilter === "custom" && (
+                        <div className="px-4 pb-3 pt-2 space-y-2">
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Start Date</label>
+                            <input
+                              type="date"
+                              value={customStartDate}
+                              onChange={(e) => setCustomStartDate(e.target.value)}
+                              className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">End Date</label>
+                            <input
+                              type="date"
+                              value={customEndDate}
+                              onChange={(e) => setCustomEndDate(e.target.value)}
+                              className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            />
+                          </div>
+                          <button
+                            onClick={() => setShowDateDropdown(false)}
+                            className="w-full px-3 py-1.5 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700"
+                          >
+                            Apply
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
             <button 
               onClick={() => signOut({ callbackUrl: "/signin" })}
               className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900 flex items-center space-x-2"
             >
-              <span>🚪</span>
               <span>Logout</span>
             </button>
           </div>
@@ -219,7 +379,7 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {calls.map((call) => (
+                {filteredCalls.map((call) => (
                   <tr 
                     key={call._id}
                     onClick={() => setSelectedCall(call)}

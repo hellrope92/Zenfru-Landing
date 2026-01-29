@@ -73,18 +73,20 @@ export async function POST(req: NextRequest) {
         let callerName = "Unknown Caller";
         let callerNumber = "N/A";
         
-        // Try to extract from transcript messages
+        // Only extract from USER messages (not agent messages)
         if (transcript && transcript.length > 0) {
-          const transcriptText = transcript.map(t => t.message).join(" ");
+          // Filter only user messages
+          const userMessages = transcript.filter(t => t.role === "user");
+          const userText = userMessages.map(t => t.message).join(" ");
           
-          // Look for name patterns (case insensitive)
-          const nameMatch = transcriptText.match(/(?:my name is|I'm|I am|this is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
+          // Look for name patterns in user messages (case insensitive)
+          const nameMatch = userText.match(/(?:my name is|I'm|I am|this is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
           if (nameMatch && nameMatch[1]) {
             callerName = nameMatch[1].trim();
           }
           
-          // Look for phone number patterns
-          const phoneMatch = transcriptText.match(/(\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\(\d{3}\)\s?\d{3}[-.\s]?\d{4})/);
+          // Look for phone number patterns in user messages
+          const phoneMatch = userText.match(/(\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\(\d{3}\)\s?\d{3}[-.\s]?\d{4})/);
           if (phoneMatch && phoneMatch[1]) {
             callerNumber = phoneMatch[1];
           }
@@ -92,18 +94,53 @@ export async function POST(req: NextRequest) {
         
         // Also try from summary
         if (summary) {
-          const nameInSummary = summary.match(/(?:patient|caller|customer)\s+(?:named|called)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
+          const nameInSummary = summary.match(/(?:patient|caller|customer|client)\s+(?:named|called|is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
           if (nameInSummary && nameInSummary[1] && callerName === "Unknown Caller") {
             callerName = nameInSummary[1].trim();
           }
           
-          const phoneInSummary = summary.match(/(\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\(\d{3}\)\s?\d{3}[-.\s]?\d{4})/);
+          const phoneInSummary = summary.match(/(?:phone|number|contact).*?(\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\(\d{3}\)\s?\d{3}[-.\s]?\d{4})/i);
           if (phoneInSummary && phoneInSummary[1] && callerNumber === "N/A") {
             callerNumber = phoneInSummary[1];
           }
         }
         
         return { callerName, callerNumber };
+      };
+
+      // Helper function to determine call outcome from summary and transcript
+      const determineCallOutcome = (summary: string, transcript: any[], analysis: any) => {
+        const lowerSummary = summary.toLowerCase();
+        const callSuccessful = analysis?.call_successful;
+        
+        // Check for booking/appointment confirmation
+        if (lowerSummary.includes("booked") || 
+            lowerSummary.includes("scheduled") || 
+            lowerSummary.includes("appointment confirmed") ||
+            lowerSummary.includes("appointment set")) {
+          return "Booked";
+        }
+        
+        // Check for callback request
+        if (lowerSummary.includes("call back") || 
+            lowerSummary.includes("callback") || 
+            lowerSummary.includes("will call") ||
+            lowerSummary.includes("reach out later") ||
+            lowerSummary.includes("contact later")) {
+          return "Call Back";
+        }
+        
+        // Check for engaged conversation (successful but not booked)
+        if (callSuccessful === "success" || 
+            lowerSummary.includes("answered") || 
+            lowerSummary.includes("provided information") ||
+            lowerSummary.includes("discussed") ||
+            lowerSummary.includes("explained")) {
+          return "Engaged";
+        }
+        
+        // Default to Engaged if call was successful
+        return "Engaged";
       };
 
       // Helper function to determine call purpose from summary
@@ -139,12 +176,16 @@ export async function POST(req: NextRequest) {
       // Extract summary and transcript
       const summary = body.data.analysis?.transcript_summary || "";
       const transcript = body.data.transcript || [];
+      const analysis = body.data.analysis;
       
       // Extract caller info from transcript and summary
       const { callerName, callerNumber } = extractCallerInfo(transcript, summary);
       
       // Determine call purpose from summary
       const callPurpose = determineCallPurpose(summary);
+      
+      // Determine call outcome
+      const callOutcome = determineCallOutcome(summary, transcript, analysis);
 
       // Extract transcription data
       const callData = {
@@ -158,6 +199,7 @@ export async function POST(req: NextRequest) {
         callType: body.data.conversation_initiation_client_data?.dynamic_variables?.call_type || "inbound",
         callAttempt: body.data.conversation_initiation_client_data?.dynamic_variables?.attempt_number || 1,
         callPurpose: callPurpose,
+        callOutcome: callOutcome,
         transcript: transcript,
         metadata: {
           startTime: new Date(body.data.metadata.start_time_unix_secs * 1000),
