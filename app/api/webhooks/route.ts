@@ -346,6 +346,17 @@ export async function POST(req: NextRequest) {
       const evaluationResults = body.data.analysis?.evaluation_criteria_results;
       const callOutcome = determineCallOutcome(evaluationResults, summary, transcript, analysis, callPurpose);
 
+      // Calculate call attempt number by counting previous calls from same number
+      let callAttempt = 1;
+      if (callerNumber && callerNumber !== "N/A") {
+        const previousCallsCount = await db.collection("calls").countDocuments({
+          callerNumber: callerNumber,
+          userId: dbUserId
+        });
+        callAttempt = previousCallsCount + 1;
+        console.log(`📞 Previous calls from ${callerNumber}: ${previousCallsCount}, Setting attempt: ${callAttempt}`);
+      }
+
       // Extract transcription data
       const callData = {
         conversationId: body.data.conversation_id,
@@ -356,7 +367,7 @@ export async function POST(req: NextRequest) {
         callerName: callerName,
         callerNumber: callerNumber,
         callType: body.data.conversation_initiation_client_data?.dynamic_variables?.call_type || "inbound",
-        callAttempt: body.data.conversation_initiation_client_data?.dynamic_variables?.attempt_number || 1,
+        callAttempt: callAttempt,
         callPurpose: callPurpose,
         callOutcome: callOutcome,
         transcript: transcript,
