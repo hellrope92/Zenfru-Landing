@@ -79,10 +79,19 @@ export async function POST(req: NextRequest) {
           const userMessages = transcript.filter(t => t.role === "user");
           const userText = userMessages.map(t => t.message).join(" ");
           
-          // Look for name patterns in user messages (case insensitive)
-          const nameMatch = userText.match(/(?:my name is|I'm|I am|this is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
-          if (nameMatch && nameMatch[1]) {
-            callerName = nameMatch[1].trim();
+          // Enhanced name patterns (case insensitive, more flexible)
+          const namePatterns = [
+            /(?:my name is|my name's|name is|name's|I'm|I am|this is|it's|speaking,?\s+this is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i,
+            /(?:^|\.\s+)([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:here|speaking|calling)/i,
+            /(?:call me|you can call me)\s+([A-Z][a-z]+)/i,
+          ];
+          
+          for (const pattern of namePatterns) {
+            const nameMatch = userText.match(pattern);
+            if (nameMatch && nameMatch[1] && !nameMatch[1].match(/^(yes|no|hello|hi|hey|okay|ok|sure|thank|thanks)$/i)) {
+              callerName = nameMatch[1].trim();
+              break;
+            }
           }
           
           // Look for phone number patterns in user messages
@@ -92,18 +101,30 @@ export async function POST(req: NextRequest) {
           }
         }
         
-        // Also try from summary
-        if (summary) {
-          const nameInSummary = summary.match(/(?:patient|caller|customer|client)\s+(?:named|called|is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
-          if (nameInSummary && nameInSummary[1] && callerName === "Unknown Caller") {
-            callerName = nameInSummary[1].trim();
+        // Also try from summary with enhanced patterns
+        if (summary && callerName === "Unknown Caller") {
+          const summaryPatterns = [
+            /(?:patient|caller|customer|client|person)\s+(?:named|called|is|name is|identified as)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i,
+            /(?:^|\.\s+)([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:called|contacted|reached out|phoned)/i,
+            /(?:from|by)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:regarding|about|to)/i,
+          ];
+          
+          for (const pattern of summaryPatterns) {
+            const nameInSummary = summary.match(pattern);
+            if (nameInSummary && nameInSummary[1] && !nameInSummary[1].match(/^(yes|no|hello|hi|hey|okay|ok|sure|thank|thanks|the|a|an)$/i)) {
+              callerName = nameInSummary[1].trim();
+              break;
+            }
           }
           
-          const phoneInSummary = summary.match(/(?:phone|number|contact).*?(\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\(\d{3}\)\s?\d{3}[-.\s]?\d{4})/i);
+          // Look for phone number in summary
+          const phoneInSummary = summary.match(/(?:phone|number|contact|reach|callback).*?(\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\(\d{3}\)\s?\d{3}[-.\s]?\d{4})/i);
           if (phoneInSummary && phoneInSummary[1] && callerNumber === "N/A") {
             callerNumber = phoneInSummary[1];
           }
         }
+        
+        console.log("Extracted caller info - Name:", callerName, "Number:", callerNumber);
         
         return { callerName, callerNumber };
       };
