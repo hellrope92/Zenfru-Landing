@@ -15,7 +15,7 @@ export default function Dashboard() {
   const [calls, setCalls] = useState<CallData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCall, setSelectedCall] = useState<CallData | null>(null);
-  const [dateFilter, setDateFilter] = useState<DateFilter>("today");
+  const [dateFilter, setDateFilter] = useState<DateFilter>("lastMonth");
   const [customStartDate, setCustomStartDate] = useState("");
   const [customEndDate, setCustomEndDate] = useState("");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
@@ -41,14 +41,17 @@ export default function Dashboard() {
         return { start: today, end: new Date() };
       
       case "lastWeek":
-        const lastWeek = new Date(today);
-        lastWeek.setDate(lastWeek.getDate() - 7);
-        return { start: lastWeek, end: new Date() };
+        // Get start of current week (Monday)
+        const currentWeekStart = new Date(today);
+        const dayOfWeek = currentWeekStart.getDay();
+        const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        currentWeekStart.setDate(currentWeekStart.getDate() - daysToMonday);
+        return { start: currentWeekStart, end: new Date() };
       
       case "lastMonth":
-        const lastMonth = new Date(today);
-        lastMonth.setMonth(lastMonth.getMonth() - 1);
-        return { start: lastMonth, end: new Date() };
+        // Get start of current month
+        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        return { start: currentMonthStart, end: new Date() };
       
       case "6months":
         const sixMonths = new Date(today);
@@ -80,8 +83,8 @@ export default function Dashboard() {
   const getDateFilterLabel = () => {
     switch (dateFilter) {
       case "today": return "Today";
-      case "lastWeek": return "Last Week";
-      case "lastMonth": return "Last Month";
+      case "lastWeek": return "This Week";
+      case "lastMonth": return "This Month";
       case "6months": return "Last 6 Months";
       case "custom": return customStartDate && customEndDate 
         ? `${customStartDate} to ${customEndDate}` 
@@ -148,13 +151,13 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center justify-between">
+      <div className="bg-white border-b border-gray-200 px-6 py-0">
+        <div className="flex items-center4 justify-between">
           <div className="flex items-center space-x-3">
             <img
               src="/logo.png"
               alt="Zenfru"
-              className="h-12 w-auto"
+              className="h-26 w-auto"
             />
           </div>
           <div className="flex items-center space-x-4">
@@ -192,7 +195,7 @@ export default function Dashboard() {
                         dateFilter === "lastWeek" ? "bg-purple-50 text-purple-600" : "text-gray-700"
                       }`}
                     >
-                      Last Week
+                      This Week
                     </button>
                     <button
                       onClick={() => {
@@ -203,7 +206,7 @@ export default function Dashboard() {
                         dateFilter === "lastMonth" ? "bg-purple-50 text-purple-600" : "text-gray-700"
                       }`}
                     >
-                      Last Month
+                      This Month
                     </button>
                     <button
                       onClick={() => {
@@ -260,7 +263,7 @@ export default function Dashboard() {
             </div>
             <button 
               onClick={() => signOut({ callbackUrl: "/signin" })}
-              className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900 flex items-center space-x-2"
+              className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900 flex items-center space-x-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               <span>Logout</span>
             </button>
@@ -277,33 +280,35 @@ export default function Dashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <span className="text-2xl">💬</span>
+          {/* Left Column - Conversations and Engagements */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <span className="text-2xl">💬</span>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Conversations Initiated</p>
+                  <p className="text-3xl font-bold text-gray-900">{totalCalls}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Conversations Initiated</p>
-                <p className="text-3xl font-bold text-gray-900">{totalCalls}</p>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center">
+                  <span className="text-2xl">👥</span>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Engagements</p>
+                  <p className="text-3xl font-bold text-gray-900">{engagements}</p>
+                </div>
               </div>
             </div>
           </div>
 
+          {/* Right Column - Call Outcomes */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center">
-                <span className="text-2xl">👥</span>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Engagements</p>
-                <p className="text-3xl font-bold text-gray-900">{engagements}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Call Outcomes */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
             <div className="flex items-center space-x-3 mb-6">
               <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
                 <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -317,7 +322,7 @@ export default function Dashboard() {
                 <span className="text-gray-700">Booked</span>
                 <div className="flex items-center space-x-3">
                   <span className="text-2xl font-bold text-gray-900">{booked}</span>
-                  <span className="text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full min-w-[60px] text-center">
+                  <span className="text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full min-w-15 text-center">
                     {totalCalls > 0 ? ((booked / totalCalls) * 100).toFixed(1) : 0}%
                   </span>
                 </div>
@@ -326,7 +331,7 @@ export default function Dashboard() {
                 <span className="text-gray-700">Engaged</span>
                 <div className="flex items-center space-x-3">
                   <span className="text-2xl font-bold text-gray-900">{engaged}</span>
-                  <span className="text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded-full min-w-[60px] text-center">
+                  <span className="text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded-full min-w-15 text-center">
                     {totalCalls > 0 ? ((engaged / totalCalls) * 100).toFixed(1) : 0}%
                   </span>
                 </div>
@@ -335,13 +340,14 @@ export default function Dashboard() {
                 <span className="text-gray-700">Call Back</span>
                 <div className="flex items-center space-x-3">
                   <span className="text-2xl font-bold text-gray-900">{callBack}</span>
-                  <span className="text-sm text-orange-600 bg-orange-50 px-3 py-1 rounded-full min-w-[60px] text-center">
+                  <span className="text-sm text-orange-600 bg-orange-50 px-3 py-1 rounded-full min-w-15 text-center">
                     {totalCalls > 0 ? ((callBack / totalCalls) * 100).toFixed(1) : 0}%
                   </span>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
         {/* Call Records Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -389,7 +395,7 @@ export default function Dashboard() {
                       {formatDate(call.metadata.startTime)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-medium">
-                      {call.callerName}
+                      {call.conversationInitiationData?.dynamic_variables?.user_name || call.callerName || "Unknown Caller"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {call.callerNumber}

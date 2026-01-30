@@ -56,7 +56,7 @@ function CallDetailsModal({ call, onClose }: CallDetailsModalProps) {
         className="bg-white h-full w-full max-w-2xl shadow-2xl overflow-y-auto"
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
               <span className="text-purple-600 font-semibold text-lg">
@@ -158,7 +158,9 @@ function CallDetailsModal({ call, onClose }: CallDetailsModalProps) {
               <h3 className="text-sm font-medium text-gray-900">Message Transcript</h3>
             </div>
             <div className="space-y-4">
-              {call.transcript && call.transcript.map((message, index) => (
+              {call.transcript && call.transcript
+                .filter(message => !(message.role === 'agent' && (!message.message || message.message.trim() === '')))
+                .map((message, index) => (
                 <div key={index} className={`flex ${message.role === 'agent' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[80%] ${
                     message.role === 'agent' 
