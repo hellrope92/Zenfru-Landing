@@ -60,18 +60,18 @@ export async function POST(req: NextRequest) {
       console.log("Processing transcription webhook...");
       
       // Map the ElevenLabs user_id to our database user
-      let dbUserId = null;
+      const dbUserId = "697ca3d3ffd8a42eb4dd1689";
       
-      // Get the first user in the database as default
-      const defaultUser = await db.collection("users").findOne({});
-      dbUserId = defaultUser?._id.toString();
-      
-      console.log("Linking call to user:", defaultUser?.email);
+      console.log("Linking call to user ID:", dbUserId);
 
       // Helper function to extract caller info from transcript
       const extractCallerInfo = (transcript: any[], summary: string) => {
         let callerName = "Unknown Caller";
         let callerNumber = "N/A";
+        
+        console.log("=== EXTRACTING CALLER INFO ===");
+        console.log("Summary:", summary);
+        console.log("Transcript messages:", transcript ? transcript.length : 0);
         
         // Only extract from USER messages (not agent messages)
         if (transcript && transcript.length > 0) {
@@ -79,18 +79,28 @@ export async function POST(req: NextRequest) {
           const userMessages = transcript.filter(t => t.role === "user");
           const userText = userMessages.map(t => t.message).join(" ");
           
-          // Enhanced name patterns (case insensitive, more flexible)
+          console.log("User messages text:", userText.substring(0, 300));
+          
+          // Enhanced name patterns (case insensitive, more flexible, without strict capitalization)
           const namePatterns = [
-            /(?:my name is|my name's|name is|name's|I'm|I am|this is|it's|speaking,?\s+this is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i,
-            /(?:^|\.\s+)([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:here|speaking|calling)/i,
-            /(?:call me|you can call me)\s+([A-Z][a-z]+)/i,
+            /(?:my name is|my name's|name is|name's|I'm|I am|this is|it's|speaking,?\s+this is)\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+            /(?:^|\.\s+)([A-Za-z]+(?:\s+[A-Za-z]+)?)\s+(?:here|speaking|calling)/i,
+            /(?:call me|you can call me)\s+([A-Za-z]+)/i,
           ];
           
           for (const pattern of namePatterns) {
             const nameMatch = userText.match(pattern);
-            if (nameMatch && nameMatch[1] && !nameMatch[1].match(/^(yes|no|hello|hi|hey|okay|ok|sure|thank|thanks)$/i)) {
-              callerName = nameMatch[1].trim();
-              break;
+            if (nameMatch && nameMatch[1]) {
+              const extractedName = nameMatch[1].trim();
+              // Filter out common words and single letters
+              if (!extractedName.match(/^(yes|no|hello|hi|hey|okay|ok|sure|thank|thanks|the|a|an|and|or|but|so|very|really|just|well|um|uh|er|ah)$/i) && extractedName.length > 1) {
+                // Capitalize properly
+                callerName = extractedName.split(' ').map(word => 
+                  word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                ).join(' ');
+                console.log("Name found in transcript:", callerName, "Pattern:", pattern);
+                break;
+              }
             }
           }
           
@@ -98,22 +108,36 @@ export async function POST(req: NextRequest) {
           const phoneMatch = userText.match(/(\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\(\d{3}\)\s?\d{3}[-.\s]?\d{4})/);
           if (phoneMatch && phoneMatch[1]) {
             callerNumber = phoneMatch[1];
+            console.log("Phone found in transcript:", callerNumber);
           }
         }
         
         // Also try from summary with enhanced patterns
         if (summary && callerName === "Unknown Caller") {
+          console.log("Trying to extract from summary...");
+          
           const summaryPatterns = [
-            /(?:patient|caller|customer|client|person)\s+(?:named|called|is|name is|identified as)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i,
-            /(?:^|\.\s+)([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:called|contacted|reached out|phoned)/i,
-            /(?:from|by)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:regarding|about|to)/i,
+            // More flexible patterns without strict capitalization
+            /(?:patient|caller|customer|client|person|individual)\s+(?:named|called|is|name is|identified as|introduced (?:themselves|himself|herself) as)\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+            /(?:^|\.\s+)([A-Za-z]+(?:\s+[A-Za-z]+)?)\s+(?:called|contacted|reached out|phoned|spoke)/i,
+            /(?:from|by)\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)\s+(?:regarding|about|to|asking|inquiring)/i,
+            /(?:name|caller):\s*([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+            /\b([A-Za-z]+(?:\s+[A-Za-z]+)?)\s+(?:is|was)\s+(?:the\s+)?(?:caller|patient|client)/i,
           ];
           
           for (const pattern of summaryPatterns) {
             const nameInSummary = summary.match(pattern);
-            if (nameInSummary && nameInSummary[1] && !nameInSummary[1].match(/^(yes|no|hello|hi|hey|okay|ok|sure|thank|thanks|the|a|an)$/i)) {
-              callerName = nameInSummary[1].trim();
-              break;
+            if (nameInSummary && nameInSummary[1]) {
+              const extractedName = nameInSummary[1].trim();
+              // Filter out common words
+              if (!extractedName.match(/^(yes|no|hello|hi|hey|okay|ok|sure|thank|thanks|the|a|an|and|or|but|so|very|really|just|well|um|uh|er|ah|they|them|their|calling|asked|wants|needs)$/i) && extractedName.length > 1) {
+                // Capitalize properly
+                callerName = extractedName.split(' ').map(word => 
+                  word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                ).join(' ');
+                console.log("Name found in summary:", callerName, "Pattern:", pattern);
+                break;
+              }
             }
           }
           
@@ -121,10 +145,14 @@ export async function POST(req: NextRequest) {
           const phoneInSummary = summary.match(/(?:phone|number|contact|reach|callback).*?(\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\(\d{3}\)\s?\d{3}[-.\s]?\d{4})/i);
           if (phoneInSummary && phoneInSummary[1] && callerNumber === "N/A") {
             callerNumber = phoneInSummary[1];
+            console.log("Phone found in summary:", callerNumber);
           }
         }
         
-        console.log("Extracted caller info - Name:", callerName, "Number:", callerNumber);
+        console.log("=== FINAL EXTRACTED INFO ===");
+        console.log("Caller Name:", callerName);
+        console.log("Caller Number:", callerNumber);
+        console.log("=============================");
         
         return { callerName, callerNumber };
       };
@@ -224,8 +252,8 @@ export async function POST(req: NextRequest) {
           return "Appointment Scheduling";
         }
         
-        // General inquiry
-        if (combinedText.match(/\b(question|inquiry|information|ask|wondering|curious|know more)\b/i)) {
+        // General inquiry - check for FAQ and general questions about clinic
+        if (combinedText.match(/\b(question|inquiry|information|ask|asking|wondering|curious|know more|tell me about|what (are|is)|do you (have|offer|provide)|how (do|does)|where (are|is)|when (are|is)|hours|location|address|directions|services|procedures|doctors|staff|clinic|office|open|close|accept|take)\b/i)) {
           return "General Inquiry";
         }
         
