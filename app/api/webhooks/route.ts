@@ -49,6 +49,9 @@ export async function POST(req: NextRequest) {
     console.log("Has data:", !!body.data);
     console.log("Conversation ID:", body.data?.conversation_id);
     console.log("Full payload keys:", Object.keys(body));
+    if (body.data?.analysis?.data_collection_results) {
+      console.log("📊 Data Collection Results:", JSON.stringify(body.data.analysis.data_collection_results, null, 2));
+    }
     console.log("========================================");
     
     // Connect to MongoDB
@@ -64,17 +67,36 @@ export async function POST(req: NextRequest) {
       
       console.log("Linking call to user ID:", dbUserId);
 
-      // Helper function to extract caller info from transcript
-      const extractCallerInfo = (transcript: any[], summary: string) => {
+      // Helper function to extract caller info from data collection results, transcript, and summary
+      const extractCallerInfo = (dataCollectionResults: any, transcript: any[], summary: string) => {
         let callerName = "Unknown Caller";
         let callerNumber = "N/A";
         
         console.log("=== EXTRACTING CALLER INFO ===");
+        console.log("Data collection results:", JSON.stringify(dataCollectionResults, null, 2));
         console.log("Summary:", summary);
         console.log("Transcript messages:", transcript ? transcript.length : 0);
         
-        // Only extract from USER messages (not agent messages)
-        if (transcript && transcript.length > 0) {
+        // APPROACH 1: Extract from data collection results (MOST RELIABLE)
+        if (dataCollectionResults) {
+          // Extract name - checking your configured field "name"
+          // ElevenLabs returns: { name: { value: "...", ... } }
+          if (dataCollectionResults.name && dataCollectionResults.name.value && dataCollectionResults.name.value.trim()) {
+            callerName = dataCollectionResults.name.value.trim();
+            console.log("✅ Name found in data_collection_results.name.value:", callerName);
+          }
+          
+          // Extract number - checking your configured field "number"
+          if (dataCollectionResults.number && dataCollectionResults.number.value && dataCollectionResults.number.value.trim()) {
+            callerNumber = dataCollectionResults.number.value.trim();
+            console.log("✅ Number found in data_collection_results.number.value:", callerNumber);
+          }
+        }
+        
+        // APPROACH 2 (FALLBACK): Extract from transcript if not found in data collection
+        
+        // Only extract from USER messages (not agent messages) if name not found yet
+        if (callerName === "Unknown Caller" && transcript && transcript.length > 0) {
           // Filter only user messages
           const userMessages = transcript.filter(t => t.role === "user");
           const userText = userMessages.map(t => t.message).join(" ");
@@ -104,11 +126,13 @@ export async function POST(req: NextRequest) {
             }
           }
           
-          // Look for phone number patterns in user messages
-          const phoneMatch = userText.match(/(\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\(\d{3}\)\s?\d{3}[-.\s]?\d{4})/);
-          if (phoneMatch && phoneMatch[1]) {
-            callerNumber = phoneMatch[1];
-            console.log("Phone found in transcript:", callerNumber);
+          // Look for phone number patterns in user messages only if not found yet
+          if (callerNumber === "N/A") {
+            const phoneMatch = userText.match(/(\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\(\d{3}\)\s?\d{3}[-.\s]?\d{4})/);
+            if (phoneMatch && phoneMatch[1]) {
+              callerNumber = phoneMatch[1];
+              console.log("Phone found in transcript:", callerNumber);
+            }
           }
         }
         
@@ -157,8 +181,38 @@ export async function POST(req: NextRequest) {
         return { callerName, callerNumber };
       };
 
-      // Helper function to determine call outcome from summary and transcript
-      const determineCallOutcome = (summary: string, transcript: any[], analysis: any) => {
+      // Helper function to determine call outcome from evaluation criteria, summary and transcript
+      const determineCallOutcome = (evaluationResults: any, summary: string, transcript: any[], analysis: any, callPurpose: string) => {
+        // PRIORITY 1: If call purpose indicates a specific action, align outcome with it
+        const lowerPurpose = callPurpose.toLowerCase();
+        
+        // If call purpose is callback-related, outcome should be Call Back
+        if (lowerPurpose.includes("call back") || lowerPurpose.includes("callback")) {
+          console.log("✅ Call outcome set to 'Call Back' based on call purpose:", callPurpose);
+          return "Call Back";
+        }
+        
+        // If call purpose is booking/scheduling and conversation was successful, likely booked
+        if ((lowerPurpose.includes("appointment") || 
+             lowerPurpose.includes("scheduling") || 
+             lowerPurpose.includes("booking") ||
+             lowerPurpose.includes("book")) && 
+            analysis?.call_successful === "success") {
+          console.log("✅ Call outcome set to 'Booked' based on call purpose and success:", callPurpose);
+          return "Booked";
+        }
+        
+        // PRIORITY 2: Check evaluation criteria results
+        if (evaluationResults && evaluationResults['Zenfru-Eval']) {
+          const evalResult = evaluationResults['Zenfru-Eval'];
+          console.log("✅ Evaluation result found:", evalResult);
+          // You can customize this based on what your Zenfru-Eval returns
+          if (evalResult.result === 'passed' || evalResult.passed === true) {
+            return "Engaged";
+          }
+        }
+        
+        // PRIORITY 3: Analyze summary
         const lowerSummary = summary.toLowerCase();
         const callSuccessful = analysis?.call_successful;
         
@@ -192,8 +246,20 @@ export async function POST(req: NextRequest) {
         return "Engaged";
       };
 
-      // Helper function to determine call purpose from summary and transcript
-      const determineCallPurpose = (summary: string, transcript: any[]) => {
+      // Helper function to determine call purpose from data collection or summary and transcript
+      const determineCallPurpose = (dataCollectionResults: any, summary: string, transcript: any[]) => {
+        // PRIORITY 1: Check data collection results first
+        // Note: field name is "call purpose" (with space) not "call_purpose"
+        if (dataCollectionResults && dataCollectionResults["call purpose"]) {
+          const purposeData = dataCollectionResults["call purpose"];
+          if (purposeData.value && purposeData.value.trim()) {
+            const purpose = purposeData.value.trim();
+            console.log("✅ Call purpose found in data_collection_results['call purpose'].value:", purpose);
+            return purpose;
+          }
+        }
+        
+        // PRIORITY 2: Fallback to analysis from summary and transcript
         if (!summary && (!transcript || transcript.length === 0)) return "General Inquiry";
         
         // Combine summary and user messages from transcript for better analysis
@@ -262,19 +328,23 @@ export async function POST(req: NextRequest) {
         return "Other";
       };
 
-      // Extract summary and transcript
+      // Extract summary, transcript, and analysis
       const summary = body.data.analysis?.transcript_summary || "";
       const transcript = body.data.transcript || [];
       const analysis = body.data.analysis;
+      const dataCollectionResults = body.data.analysis?.data_collection_results;
       
-      // Extract caller info from transcript and summary
-      const { callerName, callerNumber } = extractCallerInfo(transcript, summary);
+      console.log("📊 Data Collection Results:", JSON.stringify(dataCollectionResults, null, 2));
       
-      // Determine call purpose from summary AND transcript
-      const callPurpose = determineCallPurpose(summary, transcript);
+      // Extract caller info from data collection results first, then transcript and summary
+      const { callerName, callerNumber } = extractCallerInfo(dataCollectionResults, transcript, summary);
       
-      // Determine call outcome
-      const callOutcome = determineCallOutcome(summary, transcript, analysis);
+      // Determine call purpose from data collection results first, then summary and transcript
+      const callPurpose = determineCallPurpose(dataCollectionResults, summary, transcript);
+      
+      // Determine call outcome from evaluation criteria (pass call purpose to align outcome)
+      const evaluationResults = body.data.analysis?.evaluation_criteria_results;
+      const callOutcome = determineCallOutcome(evaluationResults, summary, transcript, analysis, callPurpose);
 
       // Extract transcription data
       const callData = {
