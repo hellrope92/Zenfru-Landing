@@ -164,34 +164,74 @@ export async function POST(req: NextRequest) {
         return "Engaged";
       };
 
-      // Helper function to determine call purpose from summary
-      const determineCallPurpose = (summary: string) => {
-        if (!summary) return "General Inquiry";
+      // Helper function to determine call purpose from summary and transcript
+      const determineCallPurpose = (summary: string, transcript: any[]) => {
+        if (!summary && (!transcript || transcript.length === 0)) return "General Inquiry";
         
-        const lowerSummary = summary.toLowerCase();
+        // Combine summary and user messages from transcript for better analysis
+        let combinedText = summary ? summary.toLowerCase() : "";
         
-        // Check for common purposes
-        if (lowerSummary.includes("appointment") || lowerSummary.includes("schedule") || lowerSummary.includes("booking")) {
-          return "Appointment Scheduling";
-        } else if (lowerSummary.includes("reschedule") || lowerSummary.includes("change appointment")) {
-          return "Reschedule Appointment";
-        } else if (lowerSummary.includes("cancel")) {
-          return "Cancel Appointment";
-        } else if (lowerSummary.includes("emergency") || lowerSummary.includes("urgent") || lowerSummary.includes("pain")) {
-          return "Emergency/Urgent Care";
-        } else if (lowerSummary.includes("insurance") || lowerSummary.includes("billing") || lowerSummary.includes("payment")) {
-          return "Billing/Insurance Inquiry";
-        } else if (lowerSummary.includes("prescription") || lowerSummary.includes("medication") || lowerSummary.includes("refill")) {
-          return "Prescription/Medication";
-        } else if (lowerSummary.includes("results") || lowerSummary.includes("test")) {
-          return "Test Results";
-        } else if (lowerSummary.includes("new patient") || lowerSummary.includes("first visit")) {
-          return "New Patient Inquiry";
-        } else if (lowerSummary.includes("question") || lowerSummary.includes("inquiry") || lowerSummary.includes("information")) {
-          return "General Inquiry";
-        } else {
-          return "Other";
+        if (transcript && transcript.length > 0) {
+          const userMessages = transcript.filter(t => t.role === "user");
+          const userText = userMessages.map(t => t.message).join(" ").toLowerCase();
+          combinedText += " " + userText;
         }
+        
+        // Check for specific purposes in order of priority (most specific first)
+        
+        // Cancellation - check before general appointment keywords
+        if (combinedText.match(/\b(cancel|canceling|cancelling|cancelled|cancel my|don't need|no longer need|want to cancel)\b/i)) {
+          return "Cancel Appointment";
+        }
+        
+        // Rescheduling - check before general appointment/schedule keywords
+        if (combinedText.match(/\b(reschedule|rescheduling|change|move|shift|different time|different day|change my appointment|move my appointment)\b/i)) {
+          return "Reschedule Appointment";
+        }
+        
+        // Callback request
+        if (combinedText.match(/\b(call back|callback|call me back|return call|reach out|contact me)\b/i)) {
+          return "Call Back Request";
+        }
+        
+        // Emergency/Urgent
+        if (combinedText.match(/\b(emergency|urgent|asap|right away|immediately|severe pain|can't wait)\b/i)) {
+          return "Emergency/Urgent Care";
+        }
+        
+        // Insurance/Billing
+        if (combinedText.match(/\b(insurance|billing|payment|charge|invoice|claim|coverage|copay|deductible)\b/i)) {
+          return "Billing/Insurance Inquiry";
+        }
+        
+        // Prescription/Medication
+        if (combinedText.match(/\b(prescription|medication|medicine|refill|pharmacy|drug|pills)\b/i)) {
+          return "Prescription/Medication";
+        }
+        
+        // Test Results
+        if (combinedText.match(/\b(test results?|lab results?|blood work|x-ray|scan results?|report)\b/i)) {
+          return "Test Results";
+        }
+        
+        // New Patient
+        if (combinedText.match(/\b(new patient|first (time|visit)|never been|haven't been before)\b/i)) {
+          return "New Patient Inquiry";
+        }
+        
+        // General appointment scheduling - only if no specific action (cancel/reschedule) was mentioned
+        if (combinedText.match(/\b(appointment|schedule|book|booking|slot|available|time|day)\b/i)) {
+          return "Appointment Scheduling";
+        }
+        
+        // General inquiry
+        if (combinedText.match(/\b(question|inquiry|information|ask|wondering|curious|know more)\b/i)) {
+          return "General Inquiry";
+        }
+        
+        console.log("Call purpose analysis - Combined text preview:", combinedText.substring(0, 200));
+        
+        return "Other";
       };
 
       // Extract summary and transcript
@@ -202,8 +242,8 @@ export async function POST(req: NextRequest) {
       // Extract caller info from transcript and summary
       const { callerName, callerNumber } = extractCallerInfo(transcript, summary);
       
-      // Determine call purpose from summary
-      const callPurpose = determineCallPurpose(summary);
+      // Determine call purpose from summary AND transcript
+      const callPurpose = determineCallPurpose(summary, transcript);
       
       // Determine call outcome
       const callOutcome = determineCallOutcome(summary, transcript, analysis);

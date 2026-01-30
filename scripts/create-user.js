@@ -2,9 +2,9 @@ const bcrypt = require('bcryptjs');
 const { MongoClient } = require('mongodb');
 
 const MONGODB_URI = "mongodb+srv://admin:Dentalai25@zenfru.3cejkij.mongodb.net/?retryWrites=true&w=majority&appName=Zenfru";
-const email = "krittikabisht019@gmail.com";
-const password = "krittika019";
-const name = "Krittika";
+const email = "dev@zenfru.com";
+const password = "zenfru1234";
+const name = "Developer";
 
 async function createUser() {
   try {
