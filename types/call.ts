@@ -7,7 +7,7 @@ export interface TranscriptMessage {
   time_in_call_secs: number;
   conversation_turn_metrics: any;
 }
-//test-push
+
 export interface CallData {
   _id?: string;
   conversationId: string;
