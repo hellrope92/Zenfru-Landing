@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect } from "react"
-import Script from "next/script"
 import Link from "next/link"
 import Image from "next/image"
+import VoiceWidgetContainer from "@/components/VoiceWidgetContainer"
 
 export default function AdacPage() {
   useEffect(() => {
@@ -91,9 +91,6 @@ export default function AdacPage() {
                   </p>
                 </div>
 
-                {/* AI Agent Widget - Renders as floating overlay */}
-                <div dangerouslySetInnerHTML={{ __html: '<elevenlabs-convai agent-id="agent_6201kd29fc4qf5gbcdk2z5mjvj7e"></elevenlabs-convai>' }} />
-
                 {/* Sample Conversation Examples */}
                 <div className="space-y-4">
                   <div className="text-sm text-slate-500 font-bold uppercase tracking-wide">
@@ -131,7 +128,7 @@ export default function AdacPage() {
           </div>
         </div>
       </div>
-      <Script src="https://unpkg.com/@elevenlabs/convai-widget-embed" strategy="afterInteractive" async type="text/javascript" />
+      <VoiceWidgetContainer agentId="agent_4101kjx2evbde6dbtn030m0zwj11" />
     </div>
   )
 }

@@ -19,8 +19,8 @@ export const BoxesCore = ({ className, ...rest }: { className?: string }) => {
     "rgb(125 211 252)", // sky-300
   ];
 
-  const getRandomColor = () => {
-    return colors[Math.floor(Math.random() * colors.length)];
+  const getColorByIndex = (rowIndex: number, colIndex: number) => {
+    return colors[(rowIndex + colIndex) % colors.length];
   };
   return (
     <div
@@ -41,7 +41,7 @@ export const BoxesCore = ({ className, ...rest }: { className?: string }) => {
           {cols.map((_, j) => (
             <motion.div
               whileHover={{
-                backgroundColor: getRandomColor(),
+                backgroundColor: getColorByIndex(i, j),
                 transition: { duration: 0.1 },
               }}
               animate={{

@@ -2,37 +2,62 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function SignIn() {
+  const { status } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/dashboard");
+    }
+  }, [status, router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPassword = password.trim();
+
+    if (!normalizedEmail || !normalizedPassword) {
+      setError("Please enter both email and password.");
+      return;
+    }
+
+    if (!EMAIL_REGEX.test(normalizedEmail)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
     setError("");
     setIsLoading(true);
 
     try {
       const result = await signIn("credentials", {
-        email,
-        password,
+        email: normalizedEmail,
+        password: normalizedPassword,
         redirect: false,
       });
 
       if (result?.error) {
-        setError("Invalid email or password");
-        setIsLoading(false);
+        setError("Invalid email or password.");
         return;
       }
 
-      router.push("/dashboard");
-    } catch (error) {
-      setError("Something went wrong. Please try again.");
+      router.replace("/dashboard");
+    } catch {
+      setError("Server error while signing in. Please try again.");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -110,6 +135,7 @@ export default function SignIn() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
+                      autoComplete="email"
                       className="w-full pl-12 pr-4 py-3 border-2 border-blue-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-400"
                       placeholder="Enter your email"
                       suppressHydrationWarning
@@ -147,6 +173,7 @@ export default function SignIn() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
+                      autoComplete="current-password"
                       className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-400"
                       placeholder="Enter your password"
                       suppressHydrationWarning
@@ -157,7 +184,7 @@ export default function SignIn() {
                 {/* Sign in button */}
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || !email.trim() || !password.trim()}
                   className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl transition duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   suppressHydrationWarning
                 >

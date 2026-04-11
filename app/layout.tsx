@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk } from 'next/font/google';
 import "./globals.css";
 import { getServerSession } from "next-auth/next";
 import SessionProvider from "@/components/SessionProvider";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 // Optimize font loading
 const inter = Inter({
@@ -20,6 +21,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://zenfru.com"),
   title: {
     default: "Zenfru - AI-Powered Virtual Front Desk for Dental Practices",
     template: "%s | Zenfru"
@@ -80,7 +82,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>

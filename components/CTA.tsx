@@ -6,7 +6,7 @@ import { BeamsBackground } from "./ui/beams-background";
 
 const CTA = () => {
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 relative">
+    <section id="support" className="py-24 px-4 sm:px-6 lg:px-8 relative">
       <div className="max-w-6xl mx-auto">
         {/* CTA Card - 80% width with rounded corners */}
         <div className="relative w-full md:w-[80%] mx-auto rounded-3xl overflow-hidden">

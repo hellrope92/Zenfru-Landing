@@ -63,10 +63,7 @@ const CoreValueSection = () => {
     }
   ];
 
-  const headingRef = useScrollReveal<HTMLHeadingElement>();
   const subtitleRef = useScrollReveal<HTMLParagraphElement>({ rootMargin: '-40px' });
-  const cardRefs = features.map(() => useScrollReveal<HTMLDivElement>({ rootMargin: '-60px' }));
-  const stickyTopOffset = '100px';
 
   return (
     <section id="features" className="py-16 md:py-24 w-full relative ">
@@ -82,14 +79,8 @@ const CoreValueSection = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              ref={cardRefs[index]}
-              className={`fade-in-up-on-scroll flex flex-col md:flex-row items-center gap-8 md:gap-12 bg-white p-6 md:p-8 rounded-xl shadow-xl ${index % 2 === 1 ? 'md:flex-row-reverse' : ''} mb-24 md:mb-32`}
-              style={{
-                position: 'sticky',
-                top: stickyTopOffset,
-                zIndex: index + 1,
-                transitionDelay: `${0.1 + index * 0.13}s`, // staggered reveal
-              }}
+              className={`fade-in-up-on-scroll flex flex-col md:flex-row items-center gap-8 md:gap-12 bg-white p-6 md:p-8 rounded-xl shadow-lg ${index % 2 === 1 ? 'md:flex-row-reverse' : ''} mb-8 md:mb-10`}
+              style={{ transitionDelay: `${0.08 + index * 0.1}s` }}
             >
               {/* Text Content */}
               <div className="md:w-1/2 text-center md:text-left">

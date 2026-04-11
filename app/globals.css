@@ -306,6 +306,17 @@ img {
   animation: blobFloatReverse 11s cubic-bezier(0.77, 0, 0.175, 1) infinite;
 }
 
+@media (max-width: 1024px) {
+  .animate-blob-float,
+  .animate-blob-float-reverse {
+    animation: none !important;
+  }
+
+  .blur-xl {
+    filter: blur(14px) !important;
+  }
+}
+
 /* Fade-in-up on scroll (for buttery smooth section reveals) */
 .fade-in-up-on-scroll {
   opacity: 0;
