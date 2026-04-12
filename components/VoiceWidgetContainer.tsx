@@ -98,7 +98,9 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
         </button>
       </div>
 
-      <div className="voice-widget-container w-full max-w-sm mx-auto h-[620px] overflow-hidden rounded-xl shadow-lg border border-slate-200 bg-slate-50">
+      <div
+        className={`voice-widget-container ${isMounted ? "voice-widget-container-mounted" : "voice-widget-container-idle"} w-full max-w-sm mx-auto overflow-hidden rounded-xl shadow-lg border border-slate-200 bg-slate-50`}
+      >
         {!isMounted && (
           <div className="flex h-full flex-col items-center justify-center px-6 text-center">
             <p className="text-sm font-semibold text-slate-800">AI Outbound Call Preview</p>
@@ -173,8 +175,12 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
         .voice-widget-container {
           width: 100%;
           max-width: 24rem;
-          height: 620px;
+          height: 420px;
           overflow: hidden;
+        }
+
+        .voice-widget-container-mounted {
+          height: 620px;
         }
 
         .voice-widget-host {
