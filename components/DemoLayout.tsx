@@ -61,24 +61,40 @@ export default function DemoLayout({ status, children }: DemoLayoutProps) {
             <span>Live Status: {statusStyle.label}</span>
           </div>
 
-          <ul className="mt-6 space-y-3 text-sm text-slate-700 sm:text-base">
-            <li className="flex items-start gap-2">
-              <span className="mt-1 h-2 w-2 rounded-full bg-slate-900" />
-              <span>Calls overdue patients automatically</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-1 h-2 w-2 rounded-full bg-slate-900" />
-              <span>Finds open slots in the next 72 hours</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-1 h-2 w-2 rounded-full bg-slate-900" />
-              <span>Books appointments instantly during the call</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-1 h-2 w-2 rounded-full bg-slate-900" />
-              <span>Sends SMS fallback when patients miss a call</span>
-            </li>
-          </ul>
+          <div className="mt-6 space-y-3 text-sm text-slate-700 sm:text-base">
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                <svg viewBox="0 0 16 16" className="h-3 w-3" aria-hidden="true">
+                  <path d="M6.3 10.8L3.7 8.2l-.9.9 3.5 3.5 6.8-6.8-.9-.9z" fill="currentColor" />
+                </svg>
+              </span>
+              <p>Calls overdue patients automatically</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                <svg viewBox="0 0 16 16" className="h-3 w-3" aria-hidden="true">
+                  <path d="M6.3 10.8L3.7 8.2l-.9.9 3.5 3.5 6.8-6.8-.9-.9z" fill="currentColor" />
+                </svg>
+              </span>
+              <p>Finds open slots in the next 72 hours</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                <svg viewBox="0 0 16 16" className="h-3 w-3" aria-hidden="true">
+                  <path d="M6.3 10.8L3.7 8.2l-.9.9 3.5 3.5 6.8-6.8-.9-.9z" fill="currentColor" />
+                </svg>
+              </span>
+              <p>Books appointments instantly during the call</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                <svg viewBox="0 0 16 16" className="h-3 w-3" aria-hidden="true">
+                  <path d="M6.3 10.8L3.7 8.2l-.9.9 3.5 3.5 6.8-6.8-.9-.9z" fill="currentColor" />
+                </svg>
+              </span>
+              <p>Sends SMS fallback when patients miss a call</p>
+            </div>
+          </div>
         </section>
 
         <section className="w-full lg:w-1/3 flex items-start justify-center lg:justify-end">{children}</section>

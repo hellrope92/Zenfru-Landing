@@ -1,5 +1,7 @@
 "use client"
 
+import Script from "next/script"
+import React from "react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import type { DemoStatus } from "@/components/DemoLayout"
 
@@ -10,111 +12,6 @@ type VoiceWidgetContainerProps = {
 
 const CONVAI_SCRIPT_SRC = "https://unpkg.com/@elevenlabs/convai-widget-embed"
 const ANIMATION_MS = 240
-const INNER_WIDGET_SCALE = 0.78
-
-let scriptReadyPromise: Promise<void> | null = null
-
-function ensureConvaiScript(): Promise<void> {
-  if (typeof window === "undefined") {
-    return Promise.resolve()
-  }
-
-  if (window.customElements?.get("elevenlabs-convai")) {
-    return Promise.resolve()
-  }
-
-  if (scriptReadyPromise) {
-    return scriptReadyPromise
-  }
-
-  scriptReadyPromise = new Promise((resolve, reject) => {
-    const existing = document.querySelector(`script[src="${CONVAI_SCRIPT_SRC}"]`) as HTMLScriptElement | null
-
-    if (existing) {
-      const onLoad = () => resolve()
-      const onError = () => reject(new Error("Failed to load ElevenLabs widget script."))
-      existing.addEventListener("load", onLoad, { once: true })
-      existing.addEventListener("error", onError, { once: true })
-
-      // If the element is already available, resolve immediately.
-      if (window.customElements?.get("elevenlabs-convai")) {
-        resolve()
-      }
-      return
-    }
-
-    const script = document.createElement("script")
-    script.src = CONVAI_SCRIPT_SRC
-    script.async = true
-    script.type = "text/javascript"
-    script.addEventListener("load", () => resolve(), { once: true })
-    script.addEventListener("error", () => reject(new Error("Failed to load ElevenLabs widget script.")), { once: true })
-    document.body.appendChild(script)
-  })
-
-  return scriptReadyPromise
-}
-
-function WidgetEmbed({
-  agentId,
-  onReady,
-  onError,
-}: {
-  agentId: string
-  onReady: () => void
-  onError: () => void
-}) {
-  const hostRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    const hostNode = hostRef.current
-
-    const mountWidget = async () => {
-      if (!hostNode || !agentId) {
-        return
-      }
-
-      await ensureConvaiScript()
-      if (cancelled) {
-        return
-      }
-
-      // Enforce a single widget instance inside this host.
-      hostNode.innerHTML = ""
-      const widget = document.createElement("elevenlabs-convai")
-      widget.setAttribute("agent-id", agentId)
-      widget.style.display = "block"
-      // Keep the vendor widget at a stable size, then center and scale it
-      // so the inner UI appears balanced within the fixed floating panel.
-      widget.style.width = "380px"
-      widget.style.height = "560px"
-      widget.style.position = "absolute"
-      widget.style.left = "50%"
-      widget.style.top = "50%"
-      widget.style.transform = `translate(-50%, -50%) scale(${INNER_WIDGET_SCALE})`
-      widget.style.transformOrigin = "center center"
-      hostNode.appendChild(widget)
-      onReady()
-    }
-
-    mountWidget().catch(() => {
-      if (hostNode) {
-        hostNode.innerHTML = '<div class="p-4 text-sm text-red-600">Unable to load voice widget. Please retry.</div>'
-      }
-      onError()
-    })
-
-    return () => {
-      cancelled = true
-      if (hostNode) {
-        hostNode.innerHTML = ""
-      }
-    }
-  }, [agentId, onError, onReady])
-
-  return <div ref={hostRef} className="relative h-full w-full overflow-hidden bg-slate-50" />
-}
 
 export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceWidgetContainerProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -173,15 +70,23 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
     onStatusChange?.("calling")
   }, [onStatusChange])
 
-  const handleWidgetError = useCallback(() => {
-    setHasError(true)
-    onStatusChange?.("ready")
-  }, [onStatusChange])
+  useEffect(() => {
+    if (!isMounted || !isVisible) {
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      setHasError(false)
+      handleWidgetReady()
+    }, 400)
+
+    return () => window.clearTimeout(timer)
+  }, [handleWidgetReady, isMounted, isVisible])
 
   return (
     <div className="w-full max-w-sm mx-auto lg:mx-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl sm:p-4">
       <div className="mb-4 flex justify-between items-center border-b border-slate-200 pb-2">
-        <p className="text-sm font-semibold text-slate-800">Live Call Panel</p>
+        <p className="text-sm font-semibold text-slate-800">Outbound calling demo</p>
         <button
           type="button"
           onClick={togglePanel}
@@ -193,7 +98,7 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
         </button>
       </div>
 
-      <div className="h-[460px] w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+      <div className="voice-widget-container w-full max-w-sm mx-auto h-[620px] overflow-hidden rounded-xl shadow-lg border border-slate-200 bg-slate-50">
         {!isMounted && (
           <div className="flex h-full flex-col items-center justify-center px-6 text-center">
             <p className="text-sm font-semibold text-slate-800">AI Outbound Call Preview</p>
@@ -207,13 +112,17 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
             className={`h-full w-full transition-all ${isVisible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
             style={{ transitionDuration: `${ANIMATION_MS}ms` }}
           >
+            <Script src={CONVAI_SCRIPT_SRC} async type="text/javascript" strategy="afterInteractive" />
             {hasError ? (
               <div className="flex h-full flex-col items-center justify-center px-6 text-center">
                 <p className="text-sm font-semibold text-red-700">Widget failed to load</p>
                 <p className="mt-2 text-xs text-slate-600">Try Start Call Demo again.</p>
               </div>
             ) : (
-              <WidgetEmbed agentId={agentId} onReady={handleWidgetReady} onError={handleWidgetError} />
+              <div className="voice-widget-host relative h-full w-full overflow-hidden">
+                {React.createElement("elevenlabs-convai", { "agent-id": agentId })}
+                <div className="voice-widget-input-mask" aria-hidden="true" />
+              </div>
             )}
           </div>
         )}
@@ -227,6 +136,81 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
           Demo call is active. Booking outcomes and SMS fallback are tracked in real time.
         </div>
       )}
+
+      <style jsx global>{`
+        elevenlabs-convai {
+          width: 100% !important;
+          height: 100% !important;
+          max-width: 100% !important;
+          min-height: 100% !important;
+          display: block;
+        }
+
+        /* Prefer external panel title and hide the vendor default help title. */
+        elevenlabs-convai::part(header-title),
+        elevenlabs-convai::part(title) {
+          display: none !important;
+        }
+
+        /* Demo mode: hide text-chat composer/input row to keep voice-only experience. */
+        elevenlabs-convai::part(composer),
+        elevenlabs-convai::part(chat-input),
+        elevenlabs-convai::part(text-input),
+        elevenlabs-convai::part(input),
+        elevenlabs-convai::part(send-button),
+        elevenlabs-convai::part(message-input) {
+          display: none !important;
+          visibility: hidden !important;
+          height: 0 !important;
+          min-height: 0 !important;
+          max-height: 0 !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          overflow: hidden !important;
+          pointer-events: none !important;
+        }
+
+        .voice-widget-container {
+          width: 100%;
+          max-width: 24rem;
+          height: 620px;
+          overflow: hidden;
+        }
+
+        .voice-widget-host {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+        }
+
+        .voice-widget-input-mask {
+          position: absolute;
+          left: 10px;
+          right: 10px;
+          bottom: 10px;
+          height: 78px;
+          border-radius: 16px;
+          background: #f8fafc;
+          z-index: 10;
+          pointer-events: none;
+        }
+
+        @media (max-width: 640px) {
+          .voice-widget-container {
+            width: 100%;
+            max-width: 100%;
+            height: 560px;
+          }
+
+          .voice-widget-input-mask {
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            height: 74px;
+          }
+        }
+      `}</style>
     </div>
   )
 }
