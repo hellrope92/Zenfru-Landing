@@ -1,32 +1,25 @@
 import React from 'react';
+import Orb from './orb';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
 interface HeroSectionProps {
   onShowDemo: () => void;
-  bookingToken?: string;
 }
 
-export default function HeroSection({ onShowDemo, bookingToken = '' }: HeroSectionProps) {
-  const router = useRouter();
-  const bookHref = bookingToken ? `/book?t=${encodeURIComponent(bookingToken)}` : '/book';
-
-  useEffect(() => {
-    router.prefetch(bookHref);
-  }, [bookHref, router]);
-
+export default function HeroSection({ onShowDemo }: HeroSectionProps) {
   return (
   <section className="relative min-h-screen max-w-100vw bg-gradient-to-br from-slate-50 via-blue-50/50 to-indigo-50 dark:from-slate-900 dark:via-blue-950/30 dark:to-indigo-950/20 overflow-hidden pt-32 pb-12">
       {/* Background Grid Pattern */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http://www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23e2e8f0%22%20fill-opacity%3D%220.4%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%221.5%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40 dark:opacity-20"></div>
       
-      {/* Lightweight halo instead of interactive orb for smoother desktop performance */}
-      <div className="hidden lg:block absolute top-20 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-blue-200/30 to-indigo-200/20 blur-3xl pointer-events-none"></div>
+      {/* Floating Orb Background */}
+  <div className="absolute top-4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] opacity-40 dark:opacity-25 pointer-events-none">
+        <Orb hue={50} hoverIntensity={0.2} rotateOnHover={true} forceHoverState={true} />
+      </div>
 
       {/* Gradient Blobs */}
-      <div className="hidden md:block absolute top-20 -left-40 w-64 h-64 bg-blue-300/15 rounded-full mix-blend-multiply filter blur-lg"></div>
-      <div className="hidden lg:block absolute bottom-20 -right-40 w-72 h-72 bg-indigo-300/15 rounded-full mix-blend-multiply filter blur-lg"></div>
+      <div className="absolute top-20 -left-40 w-80 h-80 bg-blue-300/30 rounded-full mix-blend-multiply filter blur-xl animate-blob-float"></div>
+      <div className="absolute bottom-20 -right-40 w-96 h-96 bg-indigo-300/30 rounded-full mix-blend-multiply filter blur-xl animate-blob-float-reverse"></div>
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8 text-center">
         
@@ -44,12 +37,12 @@ export default function HeroSection({ onShowDemo, bookingToken = '' }: HeroSecti
 
         {/* Main Heading */}
         <div className="mb-8 animate-fade-in-up animation-delay-200">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl lg:text-5xl xl:text-6xl">
+          <h1 className="text-5xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-6xl lg:text-7xl xl:text-8xl">
             <span className="block mb-2">Never Miss a</span>
             <span className="block bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
               Client Call
             </span>
-            <span className="block text-2xl sm:text-3xl lg:text-4xl xl:text-5xl mt-2 text-slate-700 dark:text-slate-300 font-light italic">
+            <span className="block text-4xl sm:text-5xl lg:text-6xl xl:text-7xl mt-2 text-slate-700 dark:text-slate-300 font-light italic">
               Again.
             </span>
           </h1>
@@ -65,29 +58,17 @@ export default function HeroSection({ onShowDemo, bookingToken = '' }: HeroSecti
         </div>
 
         {/* CTA Buttons */}
-        <div className="mb-16">
+        <div className="mb-16 animate-fade-in-up animation-delay-600">
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link
+            <button className="group relative px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-smooth duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-50 min-w-[200px] text-lg">
+              <Link 
               href="https://calendly.com/kay-zenfru"
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-smooth duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-50 min-w-[200px] text-lg"
             >
               Book Call
             </Link>
-
-            <Link
-              href={bookHref}
-              prefetch
-              className="group relative px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-smooth duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-50 min-w-[200px] text-lg"
-            >
-              <span className="flex items-center justify-center gap-3">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v11a2 2 0 002 2z" />
-                </svg>
-                Book Appointment
-              </span>
-            </Link>
+            </button>
             
             <button 
               onClick={onShowDemo}
