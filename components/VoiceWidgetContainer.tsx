@@ -21,6 +21,23 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
   const closeTimerRef = useRef<number | null>(null)
   const hostRef = useRef<HTMLDivElement | null>(null)
   const observerRef = useRef<MutationObserver | null>(null)
+  const patchFrameRef = useRef<number | null>(null)
+  const autoStartDoneRef = useRef(false)
+
+  const tryAutoStartCall = useCallback((root: ShadowRoot | HTMLElement) => {
+    const buttons = Array.from(root.querySelectorAll("button")) as HTMLButtonElement[]
+    const startButton = buttons.find((btn) => {
+      const label = btn.textContent?.trim().toLowerCase() || ""
+      return label.includes("start") && !label.includes("stop")
+    })
+
+    if (startButton && !startButton.disabled) {
+      startButton.click()
+      return true
+    }
+
+    return false
+  }, [])
 
   const applyShadowDomPatches = useCallback((root: ShadowRoot | HTMLElement) => {
     const allNodes = Array.from(root.querySelectorAll("*")) as HTMLElement[]
@@ -39,10 +56,13 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
     textInputs.forEach((inputEl) => {
       let current: HTMLElement | null = inputEl as HTMLElement
       for (let i = 0; i < 4 && current; i += 1) {
-        current.style.display = "none"
-        current.style.visibility = "hidden"
-        current.style.maxHeight = "0"
-        current.style.overflow = "hidden"
+        if (current.dataset.zfHiddenChat !== "1") {
+          current.dataset.zfHiddenChat = "1"
+          current.style.display = "none"
+          current.style.visibility = "hidden"
+          current.style.maxHeight = "0"
+          current.style.overflow = "hidden"
+        }
         current = current.parentElement
       }
     })
@@ -50,14 +70,16 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
     allNodes.forEach((node) => {
       const text = node.textContent?.trim().toLowerCase() || ""
       if (text === "send a message" || text === "need help?") {
-        node.style.display = "none"
-        node.style.visibility = "hidden"
+        if (node.dataset.zfPatchedText !== "1") {
+          node.dataset.zfPatchedText = "1"
+          node.style.display = "none"
+          node.style.visibility = "hidden"
+        }
       }
     })
   }, [])
 
-  const observeAndPatchWidget = useCallback(() => {
-    const host = hostRef.current
+  const observeAndPatchWidget = useCallback((host: HTMLElement | null, shouldAutoStart: boolean) => {
     if (!host) {
       return
     }
@@ -72,14 +94,29 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
       const widgetRoot = (widget as unknown as { shadowRoot?: ShadowRoot }).shadowRoot
       if (widgetRoot) {
         applyShadowDomPatches(widgetRoot)
+        if (shouldAutoStart && !autoStartDoneRef.current) {
+          tryAutoStartCall(widgetRoot)
+          autoStartDoneRef.current = true
+        }
+      } else if (shouldAutoStart && !autoStartDoneRef.current) {
+        tryAutoStartCall(host)
+        autoStartDoneRef.current = true
       }
     }
 
     patchNow()
-    const timer = window.setTimeout(patchNow, 400)
+    const timer = window.setTimeout(patchNow, 900)
 
     observerRef.current?.disconnect()
-    observerRef.current = new MutationObserver(() => patchNow())
+    observerRef.current = new MutationObserver(() => {
+      if (patchFrameRef.current !== null) {
+        return
+      }
+      patchFrameRef.current = window.requestAnimationFrame(() => {
+        patchFrameRef.current = null
+        patchNow()
+      })
+    })
     observerRef.current.observe(host, { childList: true, subtree: true, characterData: true })
 
     const widgetRoot = (widget as unknown as { shadowRoot?: ShadowRoot }).shadowRoot
@@ -89,10 +126,14 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
 
     return () => {
       window.clearTimeout(timer)
+      if (patchFrameRef.current !== null) {
+        window.cancelAnimationFrame(patchFrameRef.current)
+        patchFrameRef.current = null
+      }
       observerRef.current?.disconnect()
       observerRef.current = null
     }
-  }, [applyShadowDomPatches])
+  }, [applyShadowDomPatches, tryAutoStartCall])
 
   const clearCloseTimer = useCallback(() => {
     if (closeTimerRef.current) {
@@ -103,6 +144,7 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
 
   const openPanel = useCallback(() => {
     clearCloseTimer()
+    autoStartDoneRef.current = false
     setIsOpen(true)
     setIsMounted(true)
     onStatusChange?.("processing")
@@ -160,11 +202,15 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
       return
     }
 
-    return observeAndPatchWidget()
+    const cleanup = observeAndPatchWidget(hostRef.current, true)
+    return cleanup
   }, [isMounted, isVisible, observeAndPatchWidget])
 
   useEffect(() => {
     return () => {
+      if (patchFrameRef.current !== null) {
+        window.cancelAnimationFrame(patchFrameRef.current)
+      }
       observerRef.current?.disconnect()
       observerRef.current = null
     }
@@ -172,6 +218,8 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
 
   return (
     <div className="w-full max-w-sm mx-auto lg:mx-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl sm:p-4">
+      <Script src={CONVAI_SCRIPT_SRC} async type="text/javascript" strategy="afterInteractive" />
+
       <div className="mb-4 flex justify-between items-center border-b border-slate-200 pb-2">
         <p className="text-sm font-semibold text-slate-800">Outbound calling demo</p>
         <button
@@ -201,7 +249,6 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
             className={`h-full w-full transition-all ${isVisible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
             style={{ transitionDuration: `${ANIMATION_MS}ms` }}
           >
-            <Script src={CONVAI_SCRIPT_SRC} async type="text/javascript" strategy="afterInteractive" />
             <div ref={hostRef} className="voice-widget-host relative h-full w-full overflow-hidden">
               {React.createElement("elevenlabs-convai", { "agent-id": agentId })}
               <div className="voice-widget-input-mask" aria-hidden="true" />
@@ -257,10 +304,6 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
           max-width: 24rem;
           height: 420px;
           overflow: hidden;
-        }
-
-        .voice-widget-container-mounted {
-          height: 620px;
         }
 
         .voice-widget-host {
