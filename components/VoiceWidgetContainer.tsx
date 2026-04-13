@@ -12,13 +12,87 @@ type VoiceWidgetContainerProps = {
 
 const CONVAI_SCRIPT_SRC = "https://unpkg.com/@elevenlabs/convai-widget-embed"
 const ANIMATION_MS = 240
+const HEADER_TEXT = "Outbound calling demo"
 
 export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceWidgetContainerProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
-  const [hasError, setHasError] = useState(false)
   const closeTimerRef = useRef<number | null>(null)
+  const hostRef = useRef<HTMLDivElement | null>(null)
+  const observerRef = useRef<MutationObserver | null>(null)
+
+  const applyShadowDomPatches = useCallback((root: ShadowRoot | HTMLElement) => {
+    const allNodes = Array.from(root.querySelectorAll("*")) as HTMLElement[]
+
+    allNodes.forEach((node) => {
+      const ownText = (node.childNodes.length === 1 && node.childNodes[0].nodeType === Node.TEXT_NODE)
+        ? node.textContent?.trim()
+        : ""
+
+      if (ownText === "Need help?") {
+        node.textContent = HEADER_TEXT
+      }
+    })
+
+    const textInputs = root.querySelectorAll("input, textarea, [contenteditable='true']")
+    textInputs.forEach((inputEl) => {
+      let current: HTMLElement | null = inputEl as HTMLElement
+      for (let i = 0; i < 4 && current; i += 1) {
+        current.style.display = "none"
+        current.style.visibility = "hidden"
+        current.style.maxHeight = "0"
+        current.style.overflow = "hidden"
+        current = current.parentElement
+      }
+    })
+
+    allNodes.forEach((node) => {
+      const text = node.textContent?.trim().toLowerCase() || ""
+      if (text === "send a message" || text === "need help?") {
+        node.style.display = "none"
+        node.style.visibility = "hidden"
+      }
+    })
+  }, [])
+
+  const observeAndPatchWidget = useCallback(() => {
+    const host = hostRef.current
+    if (!host) {
+      return
+    }
+
+    const widget = host.querySelector("elevenlabs-convai") as HTMLElement | null
+    if (!widget) {
+      return
+    }
+
+    const patchNow = () => {
+      applyShadowDomPatches(host)
+      const widgetRoot = (widget as unknown as { shadowRoot?: ShadowRoot }).shadowRoot
+      if (widgetRoot) {
+        applyShadowDomPatches(widgetRoot)
+      }
+    }
+
+    patchNow()
+    const timer = window.setTimeout(patchNow, 400)
+
+    observerRef.current?.disconnect()
+    observerRef.current = new MutationObserver(() => patchNow())
+    observerRef.current.observe(host, { childList: true, subtree: true, characterData: true })
+
+    const widgetRoot = (widget as unknown as { shadowRoot?: ShadowRoot }).shadowRoot
+    if (widgetRoot) {
+      observerRef.current.observe(widgetRoot, { childList: true, subtree: true, characterData: true })
+    }
+
+    return () => {
+      window.clearTimeout(timer)
+      observerRef.current?.disconnect()
+      observerRef.current = null
+    }
+  }, [applyShadowDomPatches])
 
   const clearCloseTimer = useCallback(() => {
     if (closeTimerRef.current) {
@@ -29,7 +103,6 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
 
   const openPanel = useCallback(() => {
     clearCloseTimer()
-    setHasError(false)
     setIsOpen(true)
     setIsMounted(true)
     onStatusChange?.("processing")
@@ -76,12 +149,26 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
     }
 
     const timer = window.setTimeout(() => {
-      setHasError(false)
       handleWidgetReady()
     }, 400)
 
     return () => window.clearTimeout(timer)
   }, [handleWidgetReady, isMounted, isVisible])
+
+  useEffect(() => {
+    if (!isMounted || !isVisible) {
+      return
+    }
+
+    return observeAndPatchWidget()
+  }, [isMounted, isVisible, observeAndPatchWidget])
+
+  useEffect(() => {
+    return () => {
+      observerRef.current?.disconnect()
+      observerRef.current = null
+    }
+  }, [])
 
   return (
     <div className="w-full max-w-sm mx-auto lg:mx-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl sm:p-4">
@@ -94,7 +181,7 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
           aria-controls="voice-widget-panel"
           className="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-800"
         >
-          {isOpen ? "Stop Demo" : "Start Call Demo"}
+          {isOpen ? "Stop call" : "Start a call"}
         </button>
       </div>
 
@@ -115,17 +202,10 @@ export default function VoiceWidgetContainer({ agentId, onStatusChange }: VoiceW
             style={{ transitionDuration: `${ANIMATION_MS}ms` }}
           >
             <Script src={CONVAI_SCRIPT_SRC} async type="text/javascript" strategy="afterInteractive" />
-            {hasError ? (
-              <div className="flex h-full flex-col items-center justify-center px-6 text-center">
-                <p className="text-sm font-semibold text-red-700">Widget failed to load</p>
-                <p className="mt-2 text-xs text-slate-600">Try Start Call Demo again.</p>
-              </div>
-            ) : (
-              <div className="voice-widget-host relative h-full w-full overflow-hidden">
-                {React.createElement("elevenlabs-convai", { "agent-id": agentId })}
-                <div className="voice-widget-input-mask" aria-hidden="true" />
-              </div>
-            )}
+            <div ref={hostRef} className="voice-widget-host relative h-full w-full overflow-hidden">
+              {React.createElement("elevenlabs-convai", { "agent-id": agentId })}
+              <div className="voice-widget-input-mask" aria-hidden="true" />
+            </div>
           </div>
         )}
       </div>
